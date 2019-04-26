@@ -1,0 +1,15 @@
+# Composer
+composer.phar
+vendor
+
+# npm
+node_modules
+
+# Coverage Reporting
+report
+
+# Generated Archives
+pkg
+
+# phpunit
+.phpunit.result.cache

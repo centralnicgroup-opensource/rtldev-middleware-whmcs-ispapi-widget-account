@@ -1,0 +1,115 @@
+{
+    "name": "whmcs-ispapi-widget-account",
+    "description": "WHMCS ISPAPI Account Dashboard Widget",
+    "version": "0.0.0-development",
+    "private": true,
+    "author": {
+        "name": "Kai Schwarz",
+        "email": "kschwarz@hexonet.net"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": ">=8.3.0"
+    },
+    "homepage": "https://github.com/hexonet/whmcs-ispapi-widget-account",
+    "repository": "github:hexonet/whmcs-ispapi-widget-account",
+    "bugs": "https://github.com/hexonet/whmcs-ispapi-widget-account/issues",
+    "maintainers": [
+        {
+            "name": "Kai Schwarz",
+            "url": "https://github.com/papakai"
+        },
+        {
+            "name": "Anthony Schneider",
+            "url": "https://github.com/anthonyschn"
+        },
+        {
+            "name": "Tulasi Seelamkurthi",
+            "url": "https://github.com/tulsi91"
+        }
+    ],
+    "keywords": [
+        "whmcs",
+        "web host automation platform",
+        "dashboard",
+        "widget",
+        "account",
+        "hexonet",
+        "ispapi",
+        "domain",
+        "isp",
+        "ssl",
+        "cert",
+        "dns",
+        "backorder",
+        "premium",
+        "preregistration",
+        "registration",
+        "application"
+    ],
+    "devDependencies": {
+        "@semantic-release/changelog": "3.0.2",
+        "@semantic-release/commit-analyzer": "6.1.0",
+        "@semantic-release/exec": "3.3.2",
+        "@semantic-release/git": "7.0.8",
+        "@semantic-release/github": "5.2.10",
+        "conventional-changelog": "3.1.4",
+        "puppeteer": "1.14.0",
+        "semantic-release": "^15.13.3"
+    },
+    "release": {
+        "debug": false,
+        "analyzeCommits": {
+            "preset": "angular"
+        },
+        "generateNotes": {
+            "preset": "angular"
+        },
+        "verifyConditions": [
+            "@semantic-release/changelog",
+            "@semantic-release/git",
+            "@semantic-release/github"
+        ],
+        "prepare": [
+            {
+                "path": "@semantic-release/changelog",
+                "changelogFile": "HISTORY.md"
+            },
+            {
+                "path": "@semantic-release/exec",
+                "cmd": "./updateVersion.sh ${nextRelease.version} ${options.branch}"
+            },
+            {
+                "path": "@semantic-release/exec",
+                "cmd": "make allarchives"
+            },
+            {
+                "path": "@semantic-release/git",
+                "assets": [
+                    "HISTORY.md",
+                    "package.json",
+                    "composer.json",
+                    "ispapi_account.php",
+                    "whmcs-ispapi-widget-account-latest.zip",
+                    "release.json"
+                ],
+                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+            }
+        ],
+        "publish": [
+            {
+                "path": "@semantic-release/github",
+                "assets": [
+                    {
+                        "label": "Dashboard Widget (zip)",
+                        "path": "pkg/whmcs-ispapi-widget-account.zip"
+                    },
+                    {
+                        "label": "Dashboard Widget (tar.gz)",
+                        "path": "pkg/whmcs-ispapi-widget-account.tar.gz"
+                    }
+                ]
+            }
+        ]
+    }
+}
