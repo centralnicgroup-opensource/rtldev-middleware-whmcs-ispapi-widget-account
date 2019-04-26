@@ -1,4 +1,6 @@
 <?php
+namespace ISPAPIWIDGET;
+
 /**
  * WHMCS ISPAPI Account Dashboard Widget
  *
