@@ -33,6 +33,8 @@ Read the following to get more information ...
 For the latest WHMCS minimum system requirements, please refer to
 [https://docs.whmcs.com/System_Requirements](https://docs.whmcs.com/System_Requirements)
 
+This Dashboard Widget is only compatible with the [ISPAPI registrar module](https://github.com/hexonet/whmcs-ispapi-registrar). Please install that provider module first.
+
 ## Contributing ##
 
 Please read [our development guide](https://github.com/hexonet/whmcs-ispapi-widget-account/wiki/Development-Guide) for details on our code of conduct, and the process for submitting pull requests to us.
