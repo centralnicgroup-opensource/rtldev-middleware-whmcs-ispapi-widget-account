@@ -1,7 +1,7 @@
 <?php
 namespace ISPAPIWIDGET;
 
-use ISPAPINEW\Helper;
+use ISPAPINEW\Helper as MyHelper;
 
 /**
  * WHMCS ISPAPI Account Dashboard Widget
@@ -72,7 +72,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
      */
     private function getAccountStatus()
     {
-        $r = \ISPAPI\Helper::APICall('ispapi', array('COMMAND' => 'StatusAccount'));
+        $r = MyHelper::APICall('ispapi', array('COMMAND' => 'StatusAccount'));
         if ($r["CODE"]!="200") {
             return null;
         }
@@ -90,7 +90,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     private function getObjectStatistics()
     {
         $stats = array();
-        $r = \ISPAPI\Helper::APICall('ispapi', array('COMMAND' => 'QueryUserObjectStatistics'));
+        $r = MyHelper::APICall('ispapi', array('COMMAND' => 'QueryUserObjectStatistics'));
         if ($r["CODE"]!="200" || empty($r["PROPERTY"])) {
             return null;
         }
