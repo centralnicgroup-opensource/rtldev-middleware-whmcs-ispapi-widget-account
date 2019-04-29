@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v1.0.1...v1.0.2) (2019-04-29)
+
+
+### Bug Fixes
+
+* **pkg:** simplify namespace usage ([3a0893a](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/3a0893a))
+
 ## [1.0.1](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v1.0.0...v1.0.1) (2019-04-26)
 
 
