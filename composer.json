@@ -50,7 +50,7 @@
         "php": ">=5.6.0"
     },
     "scripts": {
-        "codeCheck": "phpcs --ignore=\"*/vendor/*\" --standard=PSR2 -q -n --colors ispapi_account.php",
+        "codeCheck": "phpcs --ignore=\"*/vendor/*\" --standard=PSR2 -s -q -n --colors ispapi_account.php",
         "codeFix": "phpcbf --ignore=\"*/vendor/*\" --standard=PSR2 -q ispapi_account.php"
     }
 }
