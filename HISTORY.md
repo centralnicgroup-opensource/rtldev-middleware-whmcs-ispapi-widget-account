@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v1.0.2...v1.0.3) (2019-04-30)
+
+
+### Bug Fixes
+
+* **Helper:** fix use of Helper class ([10d3906](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/10d3906))
+
 ## [1.0.2](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v1.0.1...v1.0.2) (2019-04-29)
 
 

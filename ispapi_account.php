@@ -404,7 +404,7 @@ class Helper
  * @license https://github.com/hexonet/whmcs-ispapi-widget-account/blob/master/LICENSE/ MIT License
  */
 
-$module_version = "1.0.2";
+$module_version = "1.0.3";
 
 add_hook('AdminHomeWidgets', 1, function () {
     return new IspapiAccountWidget();
