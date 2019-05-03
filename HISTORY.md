@@ -1,3 +1,16 @@
+# [2.0.0](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v1.0.3...v2.0.0) (2019-05-03)
+
+
+### Code Refactoring
+
+* **Helper:** use the Helper class located in shared lib folder ([aa007ae](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/aa007ae))
+
+
+### BREAKING CHANGES
+
+* **Helper:** we moved several libs for code reuse to the ispapi registrar module (>=v1.7.1). we
+define this as new dependency requirement.
+
 ## [1.0.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v1.0.2...v1.0.3) (2019-04-30)
 
 
