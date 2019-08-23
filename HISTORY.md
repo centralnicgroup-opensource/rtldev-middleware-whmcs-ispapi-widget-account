@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.0...v2.0.1) (2019-08-23)
+
+
+### Bug Fixes
+
+* **versioning:** introduce class constant VERSION ([1cfcba1](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/1cfcba1))
+
 # [2.0.0](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v1.0.3...v2.0.0) (2019-05-03)
 
 
