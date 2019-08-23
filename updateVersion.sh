@@ -10,7 +10,7 @@ branch="$2";
 date="$(date +'%Y-%m-%d')";
 
 if [ "$branch" = "master" ]; then
-    sed -i "s/\$module_version = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/\$module_version = \"${newversion}\"/g" ispapi_account.php
+    sed -i "s/VERSION = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/\VERSION = \"${newversion}\"/g" ispapi_account.php
     sed -i "s/\"version\": \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/\"version\": \"${newversion}\"/g" release.json
     sed -i "s/\"date\": \"[0-9]\+-[0-9]\+-[0-9]\+\"/\"date\": \"${date}\"/g" release.json
 fi;

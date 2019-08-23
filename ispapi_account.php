@@ -21,8 +21,6 @@ if (file_exists($path)) {
  * @license https://github.com/hexonet/whmcs-ispapi-widget-account/blob/master/LICENSE/ MIT License
  */
 
-$module_version = "2.0.0";
-
 add_hook('AdminHomeWidgets', 1, function () {
     return new IspapiAccountWidget();
 });
@@ -40,6 +38,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     protected $cacheExpiry = 120;
     protected $requiredPermission = '';
     protected $currencies = null;
+    const VERSION = "2.0.0";
 
     /**
      * load configured currencies
