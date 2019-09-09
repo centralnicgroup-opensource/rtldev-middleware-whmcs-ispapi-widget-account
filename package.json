@@ -54,7 +54,7 @@
         "@semantic-release/git": "7.0.16",
         "@semantic-release/github": "5.4.2",
         "puppeteer": "1.14.0",
-        "semantic-release": "15.13.18"
+        "semantic-release": "15.13.24"
     },
     "release": {
         "debug": false,
