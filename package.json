@@ -20,10 +20,6 @@
             "url": "https://github.com/papakai"
         },
         {
-            "name": "Anthony Schneider",
-            "url": "https://github.com/anthonyschn"
-        },
-        {
             "name": "Tulasi Seelamkurthi",
             "url": "https://github.com/tulsi91"
         }
@@ -48,66 +44,11 @@
         "application"
     ],
     "devDependencies": {
-        "@semantic-release/changelog": "^3.0.4",
-        "@semantic-release/commit-analyzer": "^6.2.0",
-        "@semantic-release/exec": "^3.3.5",
-        "@semantic-release/git": "^7.0.16",
-        "@semantic-release/github": "^5.4.2",
-        "semantic-release": "^15.13.18"
+        "semantic-release": "^15.13.18",
+        "@hexonet/semantic-release-github-whmcsbase-config": "^1.0.0"
     },
-    "release": {
-        "debug": false,
-        "analyzeCommits": {
-            "preset": "angular"
-        },
-        "generateNotes": {
-            "preset": "angular"
-        },
-        "verifyConditions": [
-            "@semantic-release/changelog",
-            "@semantic-release/git",
-            "@semantic-release/github"
-        ],
-        "prepare": [
-            {
-                "path": "@semantic-release/changelog",
-                "changelogFile": "HISTORY.md"
-            },
-            {
-                "path": "@semantic-release/exec",
-                "cmd": "./updateVersion.sh ${nextRelease.version} ${options.branch}"
-            },
-            {
-                "path": "@semantic-release/exec",
-                "cmd": "make allarchives"
-            },
-            {
-                "path": "@semantic-release/git",
-                "assets": [
-                    "HISTORY.md",
-                    "package.json",
-                    "composer.json",
-                    "ispapi_account.php",
-                    "whmcs-ispapi-widget-account-latest.zip",
-                    "release.json"
-                ],
-                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-            }
-        ],
-        "publish": [
-            {
-                "path": "@semantic-release/github",
-                "assets": [
-                    {
-                        "label": "Dashboard Widget (zip)",
-                        "path": "pkg/whmcs-ispapi-widget-account.zip"
-                    },
-                    {
-                        "label": "Dashboard Widget (tar.gz)",
-                        "path": "pkg/whmcs-ispapi-widget-account.tar.gz"
-                    }
-                ]
-            }
-        ]
+    "scripts": {
+        "codeCheck": "phpcs --ignore=\"*/vendor/*\" --standard=PSR2 -s -q -n --colors ispapi_account.php",
+        "codeFix": "phpcbf --ignore=\"*/vendor/*\" --standard=PSR2 -q ispapi_account.php"
     }
 }
