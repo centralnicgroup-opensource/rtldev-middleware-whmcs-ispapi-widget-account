@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.2...v2.0.3) (2019-09-18)
+
+
+### Bug Fixes
+
+* **release process:** review from scratch ([80a3118](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/80a3118))
+
 ## [2.0.2](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.1...v2.0.2) (2019-09-02)
 
 
