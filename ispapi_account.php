@@ -1,9 +1,10 @@
 <?php
 // phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
-namespace ISPAPI;
+namespace WHMCS\Module\Widget;
 
 use WHMCS\Database\Capsule;
 use PDO;
+use \ISPAPI\Helper;
 
 $path = implode(DIRECTORY_SEPARATOR, array(ROOTDIR,"modules","registrars","ispapi","lib","Helper.class.php"));
 if (file_exists($path)) {
