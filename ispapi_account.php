@@ -39,7 +39,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     protected $cacheExpiry = 120;
     protected $requiredPermission = '';
     protected $currencies = null;
-    const VERSION = "2.0.3";
+    const VERSION = "2.0.4";
 
     /**
      * load configured currencies

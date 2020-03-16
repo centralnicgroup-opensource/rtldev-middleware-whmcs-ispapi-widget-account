@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.3...v2.0.4) (2020-03-16)
+
+
+### Bug Fixes
+
+* **namespace changed:** fixed refresh icon + code on whmcs dashboard ([b6b20f1](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/b6b20f1a77d322e20a053369dd7145858c28f9c8))
+
 ## [2.0.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.2...v2.0.3) (2019-09-18)
 
 
