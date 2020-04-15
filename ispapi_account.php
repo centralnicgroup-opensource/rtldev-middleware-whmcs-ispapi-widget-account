@@ -4,12 +4,9 @@ namespace WHMCS\Module\Widget;
 
 use WHMCS\Database\Capsule;
 use PDO;
-use \ISPAPI\Helper;
 
-$path = implode(DIRECTORY_SEPARATOR, array(ROOTDIR,"modules","registrars","ispapi","lib","Helper.class.php"));
-if (file_exists($path)) {
-    require_once($path);
-}
+use WHMCS\Module\Registrar\Ispapi\Ispapi;
+use WHMCS\Module\Registrar\Ispapi\Helper;
 
 /**
  * WHMCS ISPAPI Account Dashboard Widget
@@ -79,7 +76,8 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
      */
     private function getAccountStatus()
     {
-        $r = Helper::APICall('ispapi', array('COMMAND' => 'StatusAccount'));
+        $r = Ispapi::call(array('COMMAND' => 'StatusAccount'));
+        
         if ($r["CODE"]!="200") {
             return null;
         }
@@ -97,7 +95,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     private function getObjectStatistics()
     {
         $stats = array();
-        $r = Helper::APICall('ispapi', array('COMMAND' => 'QueryUserObjectStatistics'));
+        $r = Ispapi::call(array('COMMAND' => 'QueryUserObjectStatistics'));
         if ($r["CODE"]!="200" || empty($r["PROPERTY"])) {
             return null;
         }
