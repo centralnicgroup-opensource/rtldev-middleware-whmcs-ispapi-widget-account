@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.4...v3.0.0) (2020-04-27)
+
+
+### Code Refactoring
+
+* **migration:** to support v3.x.x of the ispapi registrar module ([2817a2a](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/2817a2a0ce5ca14664cc1f4ec3feb106c61d97b2))
+
+
+### BREAKING CHANGES
+
+* **migration:** compatible with ISPAPI registrar module v3.x.x
+
 ## [2.0.4](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.3...v2.0.4) (2020-03-16)
 
 
