@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.0...v3.0.1) (2020-05-28)
+
+
+### Bug Fixes
+
+* **logo:** fixed unreachable logo path (setup dependant issue) to reuse github url instead ([bb6e74c](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/bb6e74c8519205ac8a1d0ff385f5714f860efa91))
+
 # [3.0.0](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v2.0.4...v3.0.0) (2020-04-27)
 
 
