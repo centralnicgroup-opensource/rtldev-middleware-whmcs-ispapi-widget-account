@@ -158,8 +158,8 @@ EOF;
      */
     public function generateOutput($data)
     {
+        $logo_url = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/registrars/ispapi/logo.gif";
         if (is_null($data)) {
-            $logo_url = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/registrars/ispapi/logo.gif";
             $git_url = "https://github.com/hexonet/whmcs-ispapi-registrar";
             return $this->returnError(
                 'Please install and activate the HEXONET ISPAPI Registrar Module v1.7.1 or higher. ' .
@@ -222,7 +222,7 @@ EOF;
                     ) .
                 '</div>' .
                 '<div class="col-sm-6 bordered-right">' .
-                    ($stats ? $stats : '<div class="text-center"><img src="../modules/registrars/ispapi/logo.gif" width="125" height="40"/></div>') .
+                    ($stats ? $stats : '<div class="text-center"><img src="' . $logo_url . '" width="125" height="40"/></div>') .
                 '</div>' .
               '</div>' .
             '</div>'
