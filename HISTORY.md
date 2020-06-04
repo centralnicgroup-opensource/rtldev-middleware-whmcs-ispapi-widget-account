@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.1...v3.0.2) (2020-06-04)
+
+
+### Bug Fixes
+
+* **logo:** reviewed logo url to new logo ([f1f6f2a](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/f1f6f2ae36760e62b820c0b869ceba1534d031d4))
+
 ## [3.0.1](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.0...v3.0.1) (2020-05-28)
 
 
