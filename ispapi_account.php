@@ -158,7 +158,7 @@ EOF;
      */
     public function generateOutput($data)
     {
-        $logo_url = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/registrars/ispapi/logo.gif";
+        $logo_url = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/registrars/ispapi/logo.png";
         if (is_null($data)) {
             $git_url = "https://github.com/hexonet/whmcs-ispapi-registrar";
             return $this->returnError(
