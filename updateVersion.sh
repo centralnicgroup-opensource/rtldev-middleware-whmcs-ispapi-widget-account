@@ -5,12 +5,14 @@
 # semantic-release. SEE package.json
 
 # version format: X.Y.Z
-newversion="$1";
-branch="$2";
-date="$(date +'%Y-%m-%d')";
+newversion="$1"
+date="$(date +'%Y-%m-%d')"
 
-if [ "$branch" = "master" ]; then
-    sed -i "s/VERSION = \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/\VERSION = \"${newversion}\"/g" ispapi_account.php
-    sed -i "s/\"version\": \"[0-9]\+\.[0-9]\+\.[0-9]\+\"/\"version\": \"${newversion}\"/g" release.json
-    sed -i "s/\"date\": \"[0-9]\+-[0-9]\+-[0-9]\+\"/\"date\": \"${date}\"/g" release.json
-fi;
+printf -v sed_script 's/VERSION = "[0-9]\+\.[0-9]\+\.[0-9]\+"/VERSION = "%s"/g' "${newversion}"
+sed -i -e "${sed_script}" ispapi_account.php
+
+printf -v sed_script 's/"version": "[0-9]\+\.[0-9]\+\.[0-9]\+"/"version": "%s"/g' "${newversion}"
+sed -i -e "${sed_script}" release.json
+
+printf -v sed_script 's/"date": "[0-9]\+-[0-9]\+-[0-9]\+"/"date": "%s"/g' "${date}"
+sed -i -e "${sed_script}" release.json
