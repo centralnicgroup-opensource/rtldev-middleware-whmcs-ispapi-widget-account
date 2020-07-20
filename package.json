@@ -49,6 +49,7 @@
         "@hexonet/semantic-release-github-whmcsbase-config": "^1.0.0"
     },
     "scripts": {
+        "phpCompatibility": "./scripts/phpcompatibility.sh",
         "codeCheck": "phpcs --standard=PSR1,PSR2 -s -q -n --colors ispapi_account.php",
         "codeFix": "phpcbf --standard=PSR1,PSR2 -q ispapi_account.php"
     }
