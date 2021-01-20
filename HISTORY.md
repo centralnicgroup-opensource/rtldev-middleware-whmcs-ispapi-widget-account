@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.2...v3.0.3) (2021-01-20)
+
+
+### Bug Fixes
+
+* **ci:** migration from Travis CI to github actions ([b5e1c82](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/b5e1c823d21149031d8727c5f122b6ed4e2e40e5))
+
 ## [3.0.2](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.1...v3.0.2) (2020-06-04)
 
 
