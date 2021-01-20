@@ -46,7 +46,7 @@
     "devDependencies": {
         "npm": ">=6.13.4",
         "semantic-release": "^17.0.2",
-        "@hexonet/semantic-release-github-whmcsbase-config": "^1.0.0"
+        "@hexonet/semantic-release-github-whmcsbase-config": "^2.0.1"
     },
     "scripts": {
         "phpCompatibility": "./scripts/phpcompatibility.sh",
