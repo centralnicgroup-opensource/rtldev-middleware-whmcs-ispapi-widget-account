@@ -1,12 +1,4 @@
 <?php
-// phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
-namespace WHMCS\Module\Widget;
-
-use WHMCS\Database\Capsule;
-use PDO;
-
-use WHMCS\Module\Registrar\Ispapi\Ispapi;
-use WHMCS\Module\Registrar\Ispapi\Helper;
 
 /**
  * WHMCS ISPAPI Account Dashboard Widget
@@ -18,6 +10,14 @@ use WHMCS\Module\Registrar\Ispapi\Helper;
  * @copyright Copyright (c) Kai Schwarz, HEXONET GmbH, 2019
  * @license https://github.com/hexonet/whmcs-ispapi-widget-account/blob/master/LICENSE/ MIT License
  */
+
+// phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
+namespace WHMCS\Module\Widget;
+
+use WHMCS\Database\Capsule;
+use PDO;
+use WHMCS\Module\Registrar\Ispapi\Ispapi;
+use WHMCS\Module\Registrar\Ispapi\Helper;
 
 add_hook('AdminHomeWidgets', 1, function () {
     return new IspapiAccountWidget();
@@ -46,7 +46,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     {
         $results = localAPI('GetCurrencies', array());
         $currencies = array();
-        if ($results["result"]=="success") {
+        if ($results["result"] == "success") {
             foreach ($results["currencies"]["currency"] as $idx => $d) {
                 $currencies[$d["code"]] = $d;
             }
@@ -77,8 +77,8 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     private function getAccountStatus()
     {
         $r = Ispapi::call(array('COMMAND' => 'StatusAccount'));
-        
-        if ($r["CODE"]!="200") {
+
+        if ($r["CODE"] != "200") {
             return null;
         }
         $balance = array();
@@ -96,7 +96,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     {
         $stats = array();
         $r = Ispapi::call(array('COMMAND' => 'QueryUserObjectStatistics'));
-        if ($r["CODE"]!="200" || empty($r["PROPERTY"])) {
+        if ($r["CODE"] != "200" || empty($r["PROPERTY"])) {
             return null;
         }
         foreach ($r["PROPERTY"] as $key => $val) {
