@@ -1,3 +1,10 @@
+## [3.0.4](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.3...v3.0.4) (2021-01-28)
+
+
+### Bug Fixes
+
+* **logo:** fixed 404 issue - logo path changed in registrar repository ([2362ff1](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/2362ff187d3325005332b716ed4033460f3999a9)), closes [#16](https://github.com/hexonet/whmcs-ispapi-widget-account/issues/16)
+
 ## [3.0.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.2...v3.0.3) (2021-01-20)
 
 
