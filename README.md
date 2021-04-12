@@ -5,47 +5,18 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/hexonet/whmcs-ispapi-widget-account/blob/master/CONTRIBUTING.md)
 
-This Repository covers the WHMCS "ISPAPI" Dashboard Widget "Account". It provides the following features in WHMCS:
-
-## Supported Features ##
-
-* Account Balance Overview
-* Product Statistics (specific customers)
+This Repository covers the WHMCS "ISPAPI" Dashboard Widget "Account".
 
 ## Resources ##
 
-* [Usage Guide](https://github.com/hexonet/whmcs-ispapi-widget-account/wiki/Usage-Guide)
+Download the ZIP archive [here](https://github.com/hexonet/whmcs-ispapi-widget-monitoring/raw/master/whmcs-ispapi-widget-monitoring-latest.zip) and follow our Documentation.
+
+* [Documentation](https://centralnic-reseller.github.io/centralnic-reseller/docs/hexonet/whmcs/whmcs-ispapi-widget-account/)
 * [Release Notes](https://github.com/hexonet/whmcs-ispapi-widget-account/releases)
-* [Development Guide](https://github.com/hexonet/whmcs-ispapi-widget-account/wiki/Development-Guide)
-
-**If you have any issue related to this module, please take a look at the FAQs [here](https://github.com/hexonet/whmcs-ispapi-widget-account/wiki/FAQs). If you can't find help in the FAQs feel free to contact our support team.**
-
-## Usage Guide ##
-
-Download the ZIP archive including the latest release version [here](https://github.com/hexonet/whmcs-ispapi-widget-account/raw/master/whmcs-ispapi-widget-account-latest.zip).
-
-Read the following to get more information ...
-
-* [Installation](https://github.com/hexonet/whmcs-ispapi-widget-account/wiki/Usage-Guide#installation)
-
-## Minimum Requirements ##
-
-For the latest WHMCS minimum system requirements, please refer to
-[https://docs.whmcs.com/System_Requirements](https://docs.whmcs.com/System_Requirements)
-
-This Dashboard Widget is only compatible with the [ISPAPI registrar module](https://github.com/hexonet/whmcs-ispapi-registrar). Please install that provider module in version >= v3.0.0 first.
-
-## Contributing ##
-
-Please read [our development guide](https://github.com/hexonet/whmcs-ispapi-widget-account/wiki/Development-Guide) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors ##
 
-* **Anthony Schneider** - *development* - [AnthonySchn](https://github.com/anthonyschn)
 * **Kai Schwarz** - *development* - [PapaKai](https://github.com/papakai)
-* **Tulasi Seelamkurthi** - *development* - [Tulsi91](https://github.com/tulsi91)
-
-See also the list of [contributors](https://github.com/hexonet/whmcs-ispapi-widget-account/graphs/contributors) who participated in this project.
 
 ## License ##
 
