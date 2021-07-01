@@ -1,20 +1,16 @@
 {
-    "phpcsparams": "--extensions=php --ignore=node_modules -q .",
-    "phpcsfixcmd": "phpcbf --standard=PSR12",
-    "phpcschkcmd": "phpcs -s -n --colors --standard=PSR12",
-    "phpcomptcmd": "phpcs -s -n --colors --standard=PHPCompatibility --runtime-set testVersion \"$(php -r 'echo PHP_MAJOR_VERSION . \".\" . PHP_MINOR_VERSION;')\"",
-    "archiveFileName": "whmcs-ispapi-widget-account",
-    "archiveBuildPath": "build",
-    "filesForArchive": [
-        "README.md",
-        "CONTRIBUTING.md",
-        "HISTORY.md",
-        "LICENSE",
-        "ispapi_account.php"
-    ],
-    "filesForCleanup": [
-        "composer.lock",
-        "package-lock.json",
-        "tmp"
-    ]
+  "phpcsparams": "--extensions=php --ignore=node_modules -q .",
+  "phpcsfixcmd": "phpcbf --standard=PSR12",
+  "phpcschkcmd": "phpcs -s -n --colors --standard=PSR12",
+  "phpcomptcmd": "phpcs -s -n --colors --standard=PHPCompatibility --runtime-set testVersion \"$(php -r 'echo PHP_MAJOR_VERSION . \".\" . PHP_MINOR_VERSION;')\"",
+  "archiveFileName": "whmcs-ispapi-widget-account",
+  "archiveBuildPath": "build",
+  "filesForArchive": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "HISTORY.md",
+    "LICENSE",
+    "modules/**"
+  ],
+  "filesForCleanup": ["composer.lock", "package-lock.json", "tmp"]
 }
