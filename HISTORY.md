@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.4...v3.1.0) (2021-07-01)
+
+
+### Features
+
+* **zipfile:** adding sub dirs to the zipFile ([f26cd5b](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/f26cd5b1d105358fb03912fd0b3a681a1198ea9f))
+
 ## [3.0.4](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.3...v3.0.4) (2021-01-28)
 
 
