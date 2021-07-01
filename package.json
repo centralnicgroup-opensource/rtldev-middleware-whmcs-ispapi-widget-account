@@ -1,61 +1,61 @@
 {
-    "name": "whmcs-ispapi-widget-account",
-    "description": "WHMCS ISPAPI Account Dashboard Widget",
-    "version": "0.0.0-development",
-    "private": true,
-    "author": {
-        "name": "Kai Schwarz",
-        "email": "kschwarz@hexonet.net"
+  "name": "whmcs-ispapi-widget-account",
+  "description": "WHMCS ISPAPI Account Dashboard Widget",
+  "version": "0.0.0-development",
+  "private": true,
+  "author": {
+    "name": "Kai Schwarz",
+    "email": "kschwarz@hexonet.net"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.0.0",
+    "npm": ">=6.13.4"
+  },
+  "homepage": "https://github.com/hexonet/whmcs-ispapi-widget-account",
+  "repository": "github:hexonet/whmcs-ispapi-widget-account",
+  "bugs": "https://github.com/hexonet/whmcs-ispapi-widget-account/issues",
+  "maintainers": [
+    {
+      "name": "Kai Schwarz",
+      "url": "https://github.com/papakai"
     },
-    "license": "MIT",
-    "engines": {
-        "node": ">=12.0.0",
-        "npm": ">=6.13.4"
-    },
-    "homepage": "https://github.com/hexonet/whmcs-ispapi-widget-account",
-    "repository": "github:hexonet/whmcs-ispapi-widget-account",
-    "bugs": "https://github.com/hexonet/whmcs-ispapi-widget-account/issues",
-    "maintainers": [
-        {
-            "name": "Kai Schwarz",
-            "url": "https://github.com/papakai"
-        },
-        {
-            "name": "Tulasi Seelamkurthi",
-            "url": "https://github.com/tulsi91"
-        }
-    ],
-    "keywords": [
-        "whmcs",
-        "web host automation platform",
-        "dashboard",
-        "widget",
-        "account",
-        "hexonet",
-        "ispapi",
-        "domain",
-        "isp",
-        "ssl",
-        "cert",
-        "dns",
-        "backorder",
-        "premium",
-        "preregistration",
-        "registration",
-        "application"
-    ],
-    "devDependencies": {
-        "semantic-release": "^17.0.2",
-        "@hexonet/semantic-release-github-whmcsbase-config": "^2.0.1",
-        "gulp": "^4.0.2",
-        "gulp-clean": "^0.4.0",
-        "gulp-tar": "^3.1.0",
-        "gulp-gzip": "^1.4.2",
-        "gulp-zip": "^5.0.2"
-    },
-    "scripts": {
-        "phpCompatibility": "./scripts/phpcompatibility.sh",
-        "codeCheck": "phpcs --standard=PSR12 -s -q -n --colors ispapi_account.php",
-        "codeFix": "phpcbf --standard=PSR12 -q ispapi_account.php"
+    {
+      "name": "Tulasi Seelamkurthi",
+      "url": "https://github.com/tulsi91"
     }
+  ],
+  "keywords": [
+    "whmcs",
+    "web host automation platform",
+    "dashboard",
+    "widget",
+    "account",
+    "hexonet",
+    "ispapi",
+    "domain",
+    "isp",
+    "ssl",
+    "cert",
+    "dns",
+    "backorder",
+    "premium",
+    "preregistration",
+    "registration",
+    "application"
+  ],
+  "devDependencies": {
+    "@hexonet/semantic-release-github-whmcsbase-config": "^2.0.1",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-gzip": "^1.4.2",
+    "gulp-tar": "^3.1.0",
+    "gulp-zip": "^5.0.2",
+    "semantic-release": "^17.0.2"
+  },
+  "scripts": {
+    "phpCompatibility": "./scripts/phpcompatibility.sh",
+    "codeCheck": "phpcs --standard=PSR12 -s -q -n --colors ispapi_account.php",
+    "codeFix": "phpcbf --standard=PSR12 -q ispapi_account.php"
+  }
 }
