@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.0...v3.1.1) (2021-07-08)
+
+
+### Bug Fixes
+
+* **semantic-release:** version update mechanism ([b47dc9e](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/b47dc9e30d93b1da6ed0c68fc154b8256ec56d9b))
+
 # [3.1.0](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.0.4...v3.1.0) (2021-07-01)
 
 
