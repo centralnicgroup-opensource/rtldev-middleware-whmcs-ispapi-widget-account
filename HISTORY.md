@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.1...v3.1.2) (2021-08-05)
+
+
+### Performance Improvements
+
+* **cleancode:** refactoring towards clean code ([26863ec](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/26863ec30cedaff1388ac4ff1b51b05ef3e34ba8))
+
 ## [3.1.1](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.0...v3.1.1) (2021-07-08)
 
 
