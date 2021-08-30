@@ -55,7 +55,7 @@
   },
   "scripts": {
     "phpCompatibility": "./scripts/phpcompatibility.sh",
-    "codeCheck": "phpcs --standard=PSR12 -s -q -n --colors ispapi_account.php",
-    "codeFix": "phpcbf --standard=PSR12 -q ispapi_account.php"
+    "codeCheck": "phpcs --standard=PSR12 -s -q -n --colors modules tests WHMCS",
+    "codeFix": "phpcbf --standard=PSR12 -q modules tests WHMCS"
   }
 }

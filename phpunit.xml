@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true"
+    stopOnFailure="false"
+    bootstrap="tests/autoload.php"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    stderr="true">
+    <testsuites>
+        <testsuite name="common">
+            <directory suffix="Test.php">tests</directory>
+        </testsuite>
+    </testsuites>
+    <logging>
+        <junit outputFile="report/junit.xml"/>
+        <teamcity outputFile="report/teamcity.txt"/>
+        <testdoxHtml outputFile="report/testdox.html"/>
+        <testdoxText outputFile="report/testdox.txt"/>
+        <testdoxXml outputFile="report/testdox.xml"/>
+        <text outputFile="report/logfile.txt"/>
+    </logging>
+</phpunit>
