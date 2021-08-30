@@ -38,41 +38,6 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
 const ISPAPI_LOGO_URL = "https://github.com/hexonet/whmcs-ispapi-registrar/raw/master/modules/registrars/ispapi/logo.png";
 const ISPAPI_REGISTRAR_GIT_URL = "https://github.com/hexonet/whmcs-ispapi-registrar";
 
-/*
-const RESPONSE_BALANCE_NO_DEPOSITS_OVERDRAFT = [
-    "PROPERTY" => [
-        "DEPOSIT" => ["0.00"],
-        "AMOUNT" => ["-16498.09"],
-        "CURRENCY" => ["CNY"]
-    ],
-    "CODE" => "200"
-];
-const RESPONSE_BALANCE_NO_DEPOSITS_NO_OVERDRAFT = [
-    "PROPERTY" => [
-        "DEPOSIT" => ["0.00"],
-        "AMOUNT" => ["16498.09"],
-        "CURRENCY" => ["CNY"]
-    ],
-    "CODE" => "200"
-];
-const RESPONSE_BALANCE_WITH_DEPOSITS_OVERDRAFT = [
-    "PROPERTY" => [
-        "DEPOSIT" => ["10000.00"],
-        "AMOUNT" => ["-16498.09"],
-        "CURRENCY" => ["CNY"]
-    ],
-    "CODE" => "200"
-];
-const RESPONSE_BALANCE_WITH_DEPOSITS_NO_OVERDRAFT = [
-    "PROPERTY" => [
-        "DEPOSIT" => ["10000.00"],
-        "AMOUNT" => ["16498.09"],
-        "CURRENCY" => ["CNY"]
-    ],
-    "CODE" => "200"
-];
-*/
-
 /**
  * ISPAPI Account Widget.
  */
@@ -97,7 +62,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 
     /**
      * Fetch data that will be provided to generateOutput method
-     * @return array|null data array or null in case of an error
+     * @return array|bool data array or false in case of an error
      */
     public function getData()
     {
@@ -107,18 +72,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
                 "stats" => $this->statsObject
             ];
         }
-        $gitURL = ISPAPI_REGISTRAR_GIT_URL;
-        return <<<HTML
-            <div class="widget-content-padded widget-billing">
-                <div class="color-pink">
-                    Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
-                    <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
-                    <a href="{$gitURL}">
-                        <img src="{$logoURL}" width="125" height="40"/>
-                    </a>
-                </div>
-            </div>
-        HTML;
+        return false;
     }
 
     /**
@@ -133,7 +87,19 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
             return $this->getFinalHTML($data["balance"], $data["stats"]);
         }
         // otherwise, error string returned
-        return $data;
+        $gitURL = ISPAPI_REGISTRAR_GIT_URL;
+        $logoURL = ISPAPI_LOGO_URL;
+        return <<<HTML
+            <div class="widget-content-padded widget-billing">
+                <div class="color-pink">
+                    Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
+                    <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
+                    <a href="{$gitURL}">
+                        <img src="{$logoURL}" width="125" height="40"/>
+                    </a>
+                </div>
+            </div>
+        HTML;
     }
     /**
      * generate final HTML for the generateOutput method
@@ -349,7 +315,7 @@ class IspapiBalance
         $fundsav = $amount - $deposit;
         $currency = $this->data["CURRENCY"];
         $currencyid = $this->currencyObject->getId($currency);
-        return [
+        $data = [
             "amount" => $amount,
             "deposit" => $deposit,
             "fundsav" => $fundsav,
@@ -358,6 +324,7 @@ class IspapiBalance
             "hasDeposits" => $deposit > 0,
             "isOverdraft" => $fundsav < 0
         ];
+        return $data;
     }
 
     /**
@@ -445,7 +412,7 @@ class IspapiCurrency
                 $currenciesAsAssocList[$d["code"]] = $d;
             }
         }
-        $this->$currencies = $currenciesAsAssocList;
+        $this->data["currencies"] = $currenciesAsAssocList;
     }
     /**
      * Magic setter
@@ -490,6 +457,6 @@ class IspapiCurrency
      */
     public function getId(string $currency): ?int
     {
-        return isset($this->currencies[$currency]) ? $this->currencies[$currency]["id"] : null;
+        return isset($this->data["currencies"][$currency]) ? $this->data["currencies"][$currency]["id"] : null;
     }
 }
