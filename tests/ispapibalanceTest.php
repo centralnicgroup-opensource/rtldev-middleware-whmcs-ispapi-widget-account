@@ -17,6 +17,25 @@ final class IspapiBalanceTest extends TestCase
         return $balance;
     }
     /**
+     * @cover magic getter
+     * @depends testBalanceInstance
+     */
+    public function testMagicMethods(IspapiBalance $balance)
+    {
+        // __get - null case
+        $this->assertNull($balance->__get("key"));
+        // __set
+        $balance->__set("key", "value");
+        // __get - test previouse set value
+        $this->assertEquals($balance->__get("key"), "value");
+        // __isset
+        $this->assertTrue($balance->__isset("key"), true);
+        // __unset
+        $balance->__unset("key");
+        // __get - test unset
+        $this->assertNull($balance->__get("key"));
+    }
+    /**
      * @depends testBalanceInstance
      */
     public function testGetData(IspapiBalance $balance)
@@ -33,6 +52,29 @@ final class IspapiBalanceTest extends TestCase
         // case no data
         $data = [];
     }
+
+    public function testToHTML()
+    {
+        // case null data
+        Ispapi::$apiCase = 0;
+        $balance = new IspapiBalance();
+        $result = $balance->toHTML();
+        $matcher = "<div class=\"color-pink\">Loading Account Data failed.</div>";
+        $this->assertStringContainsString($matcher, $result);
+        // case no deposit
+        Ispapi::$apiCase = 2;
+        $balance = new IspapiBalance();
+        $result = $balance->toHTML();
+        $matcher = "<div class=\"note\">Account Balance</div>";
+        $this->assertStringContainsString($matcher, $result);
+        // default
+        Ispapi::$apiCase = 3;
+        $balance = new IspapiBalance();
+        $result = $balance->toHTML();
+        $matcher = "<div class=\"note\">Available Funds</div>";
+        $this->assertStringContainsString($matcher, $result);
+    }
+
     public function testGetDataFormatted()
     {
         // case null data

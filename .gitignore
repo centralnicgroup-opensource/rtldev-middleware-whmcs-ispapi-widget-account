@@ -9,6 +9,7 @@ package-lock.json
 
 # Coverage Reporting
 report
+phpunit-reports
 
 # Generated Archives
 pkg

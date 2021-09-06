@@ -4,8 +4,15 @@ namespace WHMCS\Module\Registrar\Ispapi;
 
 class Ispapi
 {
+    /** @var int */
     public static $apiCase = 1;
-    public static function call($command, $params = null, $registrar = "ispapi")
+
+    /**
+     * @param array<string, string> $command
+     * @param array<string, string> $params
+     * @return array<string, mixed>
+     */
+    public static function call(array $command, array $params = null, string $registrar = "ispapi"): array
     {
         if (self::$apiCase === 0) {
             // test null, failure response, not 200
@@ -33,7 +40,7 @@ class Ispapi
                 "PROPERTY" => [
                 "DEPOSIT" => ["0.00"],
                 "AMOUNT" => ["16498.09"],
-                "CURRENCY" => ["USD"]
+                "CURRENCY" => ["CNY"]
                 ],
                 "CODE" => "200"];
         } elseif (self::$apiCase === 3) {
@@ -42,7 +49,7 @@ class Ispapi
                 "PROPERTY" => [
                 "DEPOSIT" => ["10000.00"],
                 "AMOUNT" => ["-16498.09"],
-                "CURRENCY" => ["USD"]
+                "CURRENCY" => ["CNY"]
                 ],
                 "CODE" => "200"];
         } elseif (self::$apiCase === 4) {
@@ -56,7 +63,7 @@ class Ispapi
                 "CODE" => "200"
             ];
         } else {
-            return [];
+            return []; // @codeCoverageIgnore
         }
     }
 }

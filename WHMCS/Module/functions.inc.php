@@ -1,13 +1,21 @@
 <?php
 
 // To metigate missing functions for unit test
-
-function add_hook($hook_id, $id, $cb)
+/**
+ * @codeCoverageIgnore
+ * @return bool
+ */
+function add_hook(string $hook_id, int $id, Closure $cb)
 {
     return true;
 }
 
-function localAPI($command, $params)
+/**
+ * @param string $command
+ * @param array<string, string> $params
+ * @return string
+ */
+function localAPI(string $command, array $params)
 {
     return json_decode('{
         "result": "success",
@@ -25,7 +33,10 @@ function localAPI($command, $params)
     }', true);
 }
 
-function formatCurrency($currency, $currencyID)
+/**
+ * @return string
+ */
+function formatCurrency(string $currency, int $currencyID)
 {
     return $currency;
 }

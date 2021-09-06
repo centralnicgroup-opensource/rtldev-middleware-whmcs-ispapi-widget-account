@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="true"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+    colors="true"
     stopOnFailure="false"
     bootstrap="tests/autoload.php"
     convertErrorsToExceptions="true"
@@ -11,12 +13,26 @@
             <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">modules</directory>
+            <directory suffix=".php">WHMCS</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">./vendor/</directory>
+        </exclude>
+        <report>
+            <html outputDirectory="phpunit-reports/html/html-coverage" lowUpperBound="50" highLowerBound="90"/>
+            <php outputFile="phpunit-reports/html/coverage.php"/>
+            <text outputFile="phpunit-reports/html/coverage.txt" showUncoveredFiles="true" showOnlySummary="true"/>
+        </report>
+    </coverage>
     <logging>
-        <junit outputFile="report/junit.xml"/>
-        <teamcity outputFile="report/teamcity.txt"/>
-        <testdoxHtml outputFile="report/testdox.html"/>
-        <testdoxText outputFile="report/testdox.txt"/>
-        <testdoxXml outputFile="report/testdox.xml"/>
-        <text outputFile="report/logfile.txt"/>
+        <junit outputFile="phpunit-reports/logging/junit.xml"/>
+        <teamcity outputFile="phpunit-reports/logging/teamcity.txt"/>
+        <testdoxHtml outputFile="phpunit-reports/logging/testdox.html"/>
+        <testdoxText outputFile="phpunit-reports/logging/testdox.txt"/>
+        <testdoxXml outputFile="phpunit-reports/logging/testdox.xml"/>
+        <text outputFile="phpunit-reports/logging/logfile.txt"/>
     </logging>
 </phpunit>

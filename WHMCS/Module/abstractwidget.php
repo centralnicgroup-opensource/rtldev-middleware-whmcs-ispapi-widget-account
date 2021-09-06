@@ -4,18 +4,29 @@ namespace WHMCS\Module;
 
 abstract class AbstractWidget
 {
-    protected $title = null;
-    protected $description = null;
+    /** @var string */
+    protected $title = "";
+    /** @var string */
+    protected $description = "";
+    /** @var int */
     protected $columns = 1;
+    /** @var int */
     protected $weight = 100;
+    /** @var bool */
     protected $wrapper = true;
+    /** @var bool */
     protected $cache = false;
+    /** @var bool */
     protected $cachePerUser = false;
+    /** @var int */
     protected $cacheExpiry = 3600;
+    /** @var string */
     protected $requiredPermission = "";
+    /** @var bool */
     protected $draggable = true;
+    /** @var null */
     protected $adminUser = null;
 
-    abstract public function getData();
-    abstract public function generateOutput($data);
+    abstract public function getData(); /** @phpstan-ignore-line */
+    abstract public function generateOutput(string $data); /** @phpstan-ignore-line */
 }
