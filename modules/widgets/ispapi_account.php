@@ -16,25 +16,6 @@ namespace WHMCS\Module\Widget;
 
 use WHMCS\Module\Registrar\Ispapi\Ispapi;
 
-add_hook("AdminHomeWidgets", 1, function () {
-    return new IspapiAccountWidget();
-});
-
-// css style
-add_hook("AdminAreaHeadOutput", 1, function ($vars) {
-    if ($vars["pagetitle"] === "Dashboard") {
-        return <<<HTML
-            <style>
-                .account-overview-widget {
-                    display: flex; 
-                    flex-wrap: wrap; 
-                    align-items: center;
-                }
-            </style>
-        HTML;
-    }
-});
-
 const ISPAPI_LOGO_URL = "https://github.com/hexonet/whmcs-ispapi-registrar/raw/master/modules/registrars/ispapi/logo.png";
 const ISPAPI_REGISTRAR_GIT_URL = "https://github.com/hexonet/whmcs-ispapi-registrar";
 
@@ -43,10 +24,15 @@ const ISPAPI_REGISTRAR_GIT_URL = "https://github.com/hexonet/whmcs-ispapi-regist
  */
 class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 {
-    private $currencyObject = null;
+    /** @var IspapiBalance */
     private $balanceObject = null;
+
+    /** @var IspapiStatistics */
     private $statsObject = null;
+
+    /** @var string */
     const VERSION = "3.1.2";//keep it that way (version updater, whmcs needs this accessible in public)
+
     private const TIME_IN_SECONDS = 120;
     private const SORT_WEIGHT = 150; // The sort weighting that determines the output position on the page
 
@@ -62,7 +48,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 
     /**
      * Fetch data that will be provided to generateOutput method
-     * @return array|bool data array or false in case of an error
+     * @return mixed data array or null in case of an error
      */
     public function getData()
     {
@@ -72,12 +58,26 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
                 "stats" => $this->statsObject
             ];
         }
-        return false;
+        // @codeCoverageIgnoreStart
+        $gitURL = ISPAPI_REGISTRAR_GIT_URL;
+        $logoURL = ISPAPI_LOGO_URL;
+        return <<<HTML
+            <div class="widget-content-padded widget-billing">
+                <div class="color-pink">
+                    Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
+                    <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
+                    <a href="{$gitURL}">
+                        <img src="{$logoURL}" width="125" height="40"/>
+                    </a>
+                </div>
+            </div>
+        HTML;
+        // @codeCoverageIgnoreEnd
     }
 
     /**
      * generate widget"s html output
-     * @param array $data input data (from getData method)
+     * @param mixed $data input data (from getData method)
      * @return string html code
      */
     public function generateOutput($data)
@@ -103,8 +103,8 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     }
     /**
      * generate final HTML for the generateOutput method
-     * @param array $balance Account Balance
-     * @param array $stats HTML String representing object stats
+     * @param IspapiBalance $balance Account Balance
+     * @param IspapiStatistics $stats HTML String representing object stats
      * @return string HTML code
      */
     private function getFinalHTML(IspapiBalance $balance, IspapiStatistics $stats): string
@@ -127,14 +127,16 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 }
 class IspapiStatistics
 {
+    /** @var array<string, mixed> */
     private $data = [];
     public function __construct()
     {
         // init object statistics
         $this->init();
     }
-        /**
+    /**
      * Magic setter
+     * @param array<string,mixed>|string $value
      * @return void
      */
     public function __set(string $name, $value): void
@@ -143,7 +145,7 @@ class IspapiStatistics
     }
     /**
      * Magic getter
-     * @return null or primitive data type
+     * @return mixed|null
      */
     public function __get(string $name)
     {
@@ -190,23 +192,8 @@ class IspapiStatistics
         }*/
     }
     /**
-     * get product title for a given product id
-     * @param string $productid product id
-     * @return string product title if found, product id otherwise
-     */
-    private function getProductTitle(string $productid): string
-    {
-        $map = [
-            "DOMAIN" => "Domains",
-            "DNSZONE" => "DNS Zones",
-            "MANAGEDDOMAIN" => "Domains (RegOC)",
-            "SSLCERT" => "SSL Certs"
-        ];
-        return isset($map, $productid) ? $map[$productid] : $productid;
-    }
-    /**
      * generate statistics as HTML
-     * @return string|null
+     * @return string
      */
     public function toHTML(): string
     {
@@ -234,7 +221,9 @@ class IspapiStatistics
 }
 class IspapiBalance
 {
+    /** @var array<string, mixed> */
     private $data = [];
+    /** @var IspapiCurrency */
     private $currencyObject = null;
 
     public function __construct()
@@ -246,6 +235,7 @@ class IspapiBalance
     }
     /**
      * Magic setter
+     * @param array<string,mixed>|string $value
      * @return void
      */
     public function __set(string $name, $value): void
@@ -254,7 +244,7 @@ class IspapiBalance
     }
     /**
      * Magic getter
-     * @return null or primitive data type
+     * @return mixed|null
      */
     public function __get(string $name)
     {
@@ -303,7 +293,7 @@ class IspapiBalance
 
     /**
      * get balance data
-     * @return array|null
+     * @return array<string, mixed>|null
      */
     public function getData(): ?array
     {
@@ -329,7 +319,7 @@ class IspapiBalance
 
     /**
      * get formatted balance data
-     * @return array|null
+     * @return array<string, mixed>|null
      */
     public function getDataFormatted(): ?array
     {
@@ -352,7 +342,7 @@ class IspapiBalance
 
     /**
      * generate statistics as HTML
-     * @return string|null
+     * @return string
      */
     public function toHTML(): string
     {
@@ -392,6 +382,7 @@ class IspapiBalance
 
 class IspapiCurrency
 {
+    /** @var array<string, mixed> */
     private $data = [];
 
     public function __construct()
@@ -401,14 +392,14 @@ class IspapiCurrency
     }
     /**
      * load configured currencies
-     * @return array void
+     * @return void
      */
     private function init(): void
     {
         $currencies = localAPI("GetCurrencies", []);
         $currenciesAsAssocList = [];
-        if ($currencies["result"] === "success") {
-            foreach ($currencies["currencies"]["currency"] as $idx => $d) {
+        if ($currencies["result"] === "success") { /** @phpstan-ignore-line */
+            foreach ($currencies["currencies"]["currency"] as $idx => $d) { /** @phpstan-ignore-line */
                 $currenciesAsAssocList[$d["code"]] = $d;
             }
         }
@@ -416,6 +407,7 @@ class IspapiCurrency
     }
     /**
      * Magic setter
+     * @param array<string,mixed>|string $value
      * @return void
      */
     public function __set(string $name, $value): void
@@ -460,3 +452,23 @@ class IspapiCurrency
         return isset($this->data["currencies"][$currency]) ? $this->data["currencies"][$currency]["id"] : null;
     }
 }
+
+
+add_hook("AdminHomeWidgets", 1, function () {
+    return new IspapiAccountWidget();
+});
+
+// css style
+add_hook("AdminAreaHeadOutput", 1, function ($vars) {
+    if ($vars["pagetitle"] === "Dashboard") {
+        return <<<HTML
+            <style>
+                .account-overview-widget {
+                    display: flex; 
+                    flex-wrap: wrap; 
+                    align-items: center;
+                }
+            </style>
+        HTML;
+    }
+});

@@ -37,14 +37,19 @@ final class AccoundWidgetTest extends TestCase
     {
         // array sent - check for html output
         // this depends on other two functions
-
+        $balanceObject = new IspapiBalance();
+        $statsObject = new IspapiStatistics();
+        $data = [
+                "balance" => $balanceObject,
+                "stats" => $statsObject
+        ];
+        $result = $accountwidget->generateOutput($data);
+        $matcher = "<div class=\"data color-pink\">-26498.09</div>";
+        $this->assertStringContainsString($matcher, $result);
         // bool sent - check for html output
         $data = false;
         $result = $accountwidget->generateOutput($data);
         $matcher = "Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.";
         $this->assertStringContainsString($matcher, $result);
     }
-    // public function testGetFinalHTML(){
-
-    // }
 }

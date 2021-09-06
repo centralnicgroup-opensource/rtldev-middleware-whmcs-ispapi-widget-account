@@ -1,5 +1,5 @@
 {
-  "phpcsparams": "--extensions=php --ignore=node_modules -q .",
+  "phpcsparams": "--extensions=php --ignore=node_modules,build,pkg,vendor -q .",
   "phpcsfixcmd": "phpcbf --standard=PSR12",
   "phpcschkcmd": "phpcs -s -n --colors --standard=PSR12",
   "phpcomptcmd": "phpcs -s -n --colors --standard=PHPCompatibility --runtime-set testVersion \"$(php -r 'echo PHP_MAJOR_VERSION . \".\" . PHP_MINOR_VERSION;')\"",
