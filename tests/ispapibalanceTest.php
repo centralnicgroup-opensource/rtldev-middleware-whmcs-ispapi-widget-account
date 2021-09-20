@@ -56,18 +56,21 @@ final class IspapiBalanceTest extends TestCase
     public function testToHTML()
     {
         // case null data
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 0;
         $balance = new IspapiBalance();
         $result = $balance->toHTML();
         $matcher = "<div class=\"color-pink\">Loading Account Data failed.</div>";
         $this->assertStringContainsString($matcher, $result);
         // case no deposit
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 2;
         $balance = new IspapiBalance();
         $result = $balance->toHTML();
         $matcher = "<div class=\"note\">Account Balance</div>";
         $this->assertStringContainsString($matcher, $result);
         // default
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 3;
         $balance = new IspapiBalance();
         $result = $balance->toHTML();
@@ -78,27 +81,32 @@ final class IspapiBalanceTest extends TestCase
     public function testGetDataFormatted()
     {
         // case null data
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 0;
         $balance = new IspapiBalance();
         $result = $balance->getDataFormatted();
         $this->assertNull($result);
         // case null currencyID
         // 1 = RESPONSE_BALANCE_NO_DEPOSITS_OVERDRAFT
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 1;
         $balance = new IspapiBalance();
         $result = $balance->getDataFormatted();
         $this->assertTrue($result['isOverdraft']);
         // 2 = RESPONSE_BALANCE_NO_DEPOSITS_NO_OVERDRAFT
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 2;
         $balance = new IspapiBalance();
         $result = $balance->getDataFormatted();
         $this->assertFalse($result['isOverdraft'], $result['hasDeposits']);
         // 3 = RESPONSE_BALANCE_WITH_DEPOSITS_OVERDRAFT
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 3;
         $balance = new IspapiBalance();
         $result = $balance->getDataFormatted();
         $this->assertTrue($result['isOverdraft'], $result['hasDeposits']);
         // 4 = RESPONSE_BALANCE_WITH_DEPOSITS_NO_OVERDRAFT
+        unset($_SESSION["ispapibalance"]);
         Ispapi::$apiCase = 4;
         $balance = new IspapiBalance();
         $result = $balance->getDataFormatted();

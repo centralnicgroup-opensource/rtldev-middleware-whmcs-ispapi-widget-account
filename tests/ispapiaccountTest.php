@@ -40,8 +40,9 @@ final class AccoundWidgetTest extends TestCase
         $balanceObject = new IspapiBalance();
         $statsObject = new IspapiStatistics();
         $data = [
-                "balance" => $balanceObject,
-                "stats" => $statsObject
+            "balance" => $balanceObject,
+            "stats" => $statsObject,
+            "status" => 1
         ];
         $result = $accountwidget->generateOutput($data);
         $matcher = "<div class=\"data color-pink\">-26498.09</div>";
