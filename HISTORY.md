@@ -1,3 +1,10 @@
+## [3.1.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.2...v3.1.3) (2021-09-20)
+
+
+### Performance Improvements
+
+* **ttfb:** improved by session cache and status toggle icon ([fa2d2d1](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/fa2d2d1de2f6e548a0e1f7abbea74ffec833667c))
+
 ## [3.1.2](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.1...v3.1.2) (2021-08-05)
 
 
