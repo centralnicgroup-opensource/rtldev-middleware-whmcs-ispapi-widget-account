@@ -5,3 +5,5 @@ require_once __DIR__ . '/../WHMCS/Module/functions.inc.php';
 require_once __DIR__ . '/../WHMCS/Module/abstractwidget.php';
 require_once __DIR__ . '/../modules/widgets/ispapi_account.php';
 require_once __DIR__ . '/../WHMCS/Module/Registrar/Ispapi/Ispapi.php';
+require_once __DIR__ . '/../WHMCS/Config/Setting.php';
+require_once __DIR__ . '/../WHMCS/App.php';

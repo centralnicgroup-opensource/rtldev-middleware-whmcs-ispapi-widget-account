@@ -44,7 +44,7 @@ final class IspapiStatisticsTest extends TestCase
     {
         // case empty data
         $result = $statistics->toHTML();
-        $matcher = "https://github.com/hexonet/whmcs-ispapi-registrar/raw/master/modules/registrars/ispapi/logo.png";
+        $matcher = ISPAPI_LOGO_URL;
         $this->assertStringContainsString($matcher, $result);
         // case there is data
         $statistics->__set("productTitle", "val");

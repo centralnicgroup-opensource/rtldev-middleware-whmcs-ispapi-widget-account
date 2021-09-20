@@ -33,8 +33,8 @@ jobs:
           composer update
       - name: Unit Tests and Static Code Analysis
         run: |
-          composer run-script test
           composer run-script phpstan
+          composer run-script test
       - name: Setup NodeJS LTS
         uses: actions/setup-node@v2
       - name: Install dependencies

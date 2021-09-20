@@ -16,7 +16,7 @@ namespace WHMCS\Module\Widget;
 
 use WHMCS\Module\Registrar\Ispapi\Ispapi;
 
-const ISPAPI_LOGO_URL = "https://github.com/hexonet/whmcs-ispapi-registrar/raw/master/modules/registrars/ispapi/logo.png";
+const ISPAPI_LOGO_URL = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png";
 const ISPAPI_REGISTRAR_GIT_URL = "https://github.com/hexonet/whmcs-ispapi-registrar";
 
 /**
@@ -38,6 +38,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 
     public function __construct()
     {
+        session_start();
         // prefer composition over inheritance
         $this->balanceObject = new IspapiBalance();
         $this->statsObject = new IspapiStatistics();
@@ -52,26 +53,29 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
      */
     public function getData()
     {
-        if (class_exists(Ispapi::class)) {
+        $status = \App::getFromRequest("status");
+        if ($status !== "") {
+            $status = (int)$status;
+            if (in_array($status, [0,1])) {
+                \WHMCS\Config\Setting::setValue("ispapiAccountWidget", $status);
+            }
             return [
+                "success" => (int)\WHMCS\Config\Setting::getValue("ispapiAccountWidget") === $status
+            ];
+        }
+        if (class_exists(Ispapi::class)) {
+            $status = \WHMCS\Config\Setting::getValue("ispapiAccountWidget");
+            if (is_null($status)) {
+                $status = 1;
+            }
+            return [
+                "status" => (int)$status,
                 "balance" => $this->balanceObject,
                 "stats" => $this->statsObject
             ];
         }
         // @codeCoverageIgnoreStart
-        $gitURL = ISPAPI_REGISTRAR_GIT_URL;
-        $logoURL = ISPAPI_LOGO_URL;
-        return <<<HTML
-            <div class="widget-content-padded widget-billing">
-                <div class="color-pink">
-                    Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
-                    <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
-                    <a href="{$gitURL}">
-                        <img src="{$logoURL}" width="125" height="40"/>
-                    </a>
-                </div>
-            </div>
-        HTML;
+        return false;
         // @codeCoverageIgnoreEnd
     }
 
@@ -84,8 +88,75 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
     {
         // generate HTML
         if (is_array($data)) {
-            return $this->getFinalHTML($data["balance"], $data["stats"]);
+            // post request
+            if (isset($data["success"])) {
+                return json_encode($data) ?: "[\"success\":false]";
+            }
+            // show our widget
+            $status = $data["status"];
+            if ($data["status"] === 0) {
+                $html = <<<HTML
+                <div class="widget-billing">
+                    <div class="row account-overview-widget">
+                        <div class="col-sm-12">
+                            <div class="item">
+                                <div class="note">
+                                    Widget is currently disabled. Use the first icon for enabling.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                HTML;
+            } else {
+                $balanceHTML = $data["balance"]->toHTML();
+                $statsHTML = $data["stats"]->toHTML();
+                $html = <<<HTML
+                    <div class="widget-billing">
+                        <div class="row account-overview-widget">
+                            <div class="col-sm-6 bordered-right">
+                                {$balanceHTML}
+                            </div>
+                            <div class="col-sm-6">
+                                {$statsHTML}
+                            </div>
+                        </div>
+                    </div>
+                HTML;
+            }
+            // Data Refresh Request -> avoid including JavaScript
+            if (!empty($_REQUEST["refresh"])) {
+                return $html;
+            }
+
+            $ico = ($status === 1) ? "on" : "off";
+            $html = <<<HTML
+                {$html}
+                <script type="text/javascript">
+                hxStartCounter("#balexpires");
+                if (!$("#panelIspapiAccountWidget .widget-tools .hx-widget-toggle").length) {
+                    $("#panelIspapiAccountWidget .widget-tools").prepend(
+                        `<a href="#" class="hx-widget-toggle" data-status="${status}">
+                            <i class=\"fas fa-toggle-${ico}\"></i>
+                        </a>`
+                    );
+                }
+                $("#panelIspapiAccountWidget .hx-widget-toggle").off().on("click", function (event) {
+                    const newstatus = (1 - $(this).data("status"));
+                    const url = WHMCS.adminUtils.getAdminRouteUrl("/widget/refresh&widget=IspapiAccountWidget&status=" + newstatus)
+                    WHMCS.http.jqClient.post(url, function (json) {
+                            if (json.success && (JSON.parse(json.widgetOutput)).success) {
+                                window.location.reload(); // widget refresh doesn't update the height
+                            }
+                        },
+                        'json'
+                    );
+                });
+                </script>
+            HTML;
+            return $html;
         }
+
         // otherwise, error string returned
         $gitURL = ISPAPI_REGISTRAR_GIT_URL;
         $logoURL = ISPAPI_LOGO_URL;
@@ -97,29 +168,6 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
                     <a href="{$gitURL}">
                         <img src="{$logoURL}" width="125" height="40"/>
                     </a>
-                </div>
-            </div>
-        HTML;
-    }
-    /**
-     * generate final HTML for the generateOutput method
-     * @param IspapiBalance $balance Account Balance
-     * @param IspapiStatistics $stats HTML String representing object stats
-     * @return string HTML code
-     */
-    private function getFinalHTML(IspapiBalance $balance, IspapiStatistics $stats): string
-    {
-        $balanceHTML = $balance->toHTML();
-        $statsHTML = $stats->toHTML();
-        return <<<HTML
-            <div class="widget-billing">
-                <div class="row account-overview-widget">
-                    <div class="col-sm-6 bordered-right">
-                        {$balanceHTML}
-                    </div>
-                    <div class="col-sm-6 bordered-right">
-                        {$statsHTML}
-                    </div>
                 </div>
             </div>
         HTML;
@@ -276,6 +324,14 @@ class IspapiBalance
      */
     private function init(): void
     {
+        if (
+            empty($_REQUEST["refresh"]) // no refresh request
+            && isset($_SESSION["ispapibalance"]) // data cache exists
+            && (time() <= $_SESSION["ispapibalance"]["expires"]) // data cache not expired
+        ) {
+            $this->data = $_SESSION["ispapibalance"]["data"];
+            return;
+        }
         $this->data = [];
         $accountsStatus = Ispapi::call([
             "COMMAND" => "StatusAccount"
@@ -288,6 +344,11 @@ class IspapiBalance
             foreach ($accountsStatus["PROPERTY"] as $property => $value) {
                 $this->data[$property] = $value[0];
             }
+            $_SESSION["ispapibalance"] = [
+                "data" => $this->data,
+                "expires" => time() + 3600,
+                "ttl" => 3600
+            ];
         }
     }
 
@@ -341,7 +402,7 @@ class IspapiBalance
     }
 
     /**
-     * generate statistics as HTML
+     * generate balance as HTML
      * @return string
      */
     public function toHTML(): string
@@ -356,7 +417,24 @@ class IspapiBalance
         }
 
         $balanceColor = $data["isOverdraft"] ? "pink" : "green";
+        if (isset($_SESSION["ispapibalance"]["expires"])) {
+            $expires = $_SESSION["ispapibalance"]["expires"] - time();
+            $ttl = $_SESSION["ispapibalance"]["ttl"];
+            $startHTML = <<<HTML
+                <div class="item text-right">
+                    <div class="note">Data Cache expires: <span id="balexpires" class="ttlcounter" data-ttl="{$ttl}" data-expires="{$expires}" ></span></div>
+                    <script type="text/javascript">
+                    $("#balexpires").html(hxSecondsToHms({$expires}, {$ttl}));
+                    </script>
+                </div>
+            HTML;
+        } else {
+            $startHTML = <<<HTML
+                <div class="item text-right"><div class="note">&nbsp;</div></div>
+            HTML;
+        }
         $baseHTML = <<<HTML
+            {$startHTML}
             <div class="item text-right">
                 <div class="data color-{$balanceColor}">{$data["fundsav"]}</div>
                 <div class="note">Account Balance</div>
@@ -375,7 +453,7 @@ class IspapiBalance
             <div class="item bordered-top text-right">
                 <div class="data color-{$balanceColor}">{$data["fundsav"]}</div>
                 <div class="note">Available Funds</div>
-            </div>            
+            </div>
         HTML;
     }
 }
@@ -469,6 +547,47 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
                     align-items: center;
                 }
             </style>
+            <script>
+            let hxbalcounter = null;
+            function hxStartCounter(sel) {
+                if (!$(sel).length || hxbalcounter !== null) {
+                    return;
+                }
+                hxbalcounter = setInterval(function(){
+                    $(sel).each(hxDecrementCounter);
+                }, 1000);
+            }
+            function hxDecrementCounter() {
+                const expires = $(this).data("expires") - 1;
+                const ttl = $(this).data("ttl");
+                $(this).data("expires", expires);
+                $(this).html(hxSecondsToHms(expires, ttl));
+            }
+            function hxSecondsToHms(d, ttl) {
+                d = Number(d);
+                const ttls = [3600,60,1];
+                let units = ["h", "m", "s"];
+                let vals = [
+                    Math.floor(d / 3600), // h
+                    Math.floor(d % 3600 / 60), // m
+                    Math.floor(d % 3600 % 60) // s
+                ];
+                let steps = ttls.length;
+                ttls.forEach(row => {
+                    if (ttl / row === 1 && ttl % row === 0){
+                        steps--;
+                    }
+                });
+                vals = vals.splice(vals.length - steps);
+                units = units.splice(units.length - steps);
+
+                let html = "";
+                vals.forEach((val, idx) => {
+                    html += " " + val + units[idx];
+                });
+                return html.substr(1);
+            }
+            </script>
         HTML;
     }
 });
