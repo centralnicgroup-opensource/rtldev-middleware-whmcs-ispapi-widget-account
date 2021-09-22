@@ -30,27 +30,47 @@ final class AccoundWidgetTest extends TestCase
         return $data;
     }
     /**
-     * @depends testGetData
      * @depends testAccountWidgetInstance
      */
-    public function testGenerateOutput(array $data, IspapiAccountWidget $accountwidget)
+    public function testGenerateOutput(IspapiAccountWidget $accountwidget)
     {
-        // array sent - check for html output
-        // this depends on other two functions
+        // enabled widget, api data available
         $balanceObject = new IspapiBalance();
         $statsObject = new IspapiStatistics();
-        $data = [
+        $result = $accountwidget->generateOutput([
             "balance" => $balanceObject,
             "stats" => $statsObject,
             "status" => 1
-        ];
-        $result = $accountwidget->generateOutput($data);
+        ]);
         $matcher = "<div class=\"data color-pink\">-26498.09</div>";
         $this->assertStringContainsString($matcher, $result);
-        // bool sent - check for html output
-        $data = false;
-        $result = $accountwidget->generateOutput($data);
+        $matcher = "window.location.reload()";
+        $this->assertStringContainsString($matcher, $result);
+
+        // registrar module missing or inactive
+        $result = $accountwidget->generateOutput([ "status" => -1 ]);
         $matcher = "Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.";
         $this->assertStringContainsString($matcher, $result);
+        $matcher = "window.location.reload()";
+        $this->assertStringNotContainsString($matcher, $result);
+
+        // widget status has changed via xhr req
+        $result = $accountwidget->generateOutput([ "success" => true ]);
+        $matcher = "{\"success\":true}";
+        $this->assertStringContainsString($matcher, $result);
+        $matcher = "window.location.reload()";
+        $this->assertStringNotContainsString($matcher, $result);
+
+        // refresh request - main js logics shall not be returned
+        $_REQUEST["refresh"] = 1;
+        $result = $accountwidget->generateOutput([
+            "balance" => $balanceObject,
+            "stats" => $statsObject,
+            "status" => 1
+        ]);
+        $matcher = "<div class=\"data color-pink\">-26498.09</div>";
+        $this->assertStringContainsString($matcher, $result);
+        $matcher = "window.location.reload()";
+        $this->assertStringNotContainsString($matcher, $result);
     }
 }

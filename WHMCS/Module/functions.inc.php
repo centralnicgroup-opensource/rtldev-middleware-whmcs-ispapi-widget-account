@@ -13,7 +13,7 @@ function add_hook(string $hook_id, int $id, Closure $cb)
 /**
  * @param string $command
  * @param array<string, string> $params
- * @return string
+ * @return array<string, mixed>
  */
 function localAPI(string $command, array $params)
 {
