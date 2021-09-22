@@ -1,3 +1,10 @@
+## [3.1.7](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.6...v3.1.7) (2021-09-22)
+
+
+### Bug Fixes
+
+* **oop:** ensure shared class is only declared once ([6b56313](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/6b5631360cc7c22be54149cded642ac158648da1))
+
 ## [3.1.6](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.5...v3.1.6) (2021-09-22)
 
 
