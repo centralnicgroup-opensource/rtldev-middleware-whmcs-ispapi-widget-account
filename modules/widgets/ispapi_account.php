@@ -144,7 +144,7 @@ class IspapiAccountWidget extends IspapiBaseWidget
     private $statsObject = null;
 
     /** @var string */
-    const VERSION = "3.1.4";//keep it that way (version updater, whmcs needs this accessible in public)
+    const VERSION = "3.1.5";//keep it that way (version updater, whmcs needs this accessible in public)
 
     private const TIME_IN_SECONDS = 120;
     private const SORT_WEIGHT = 150; // The sort weighting that determines the output position on the page

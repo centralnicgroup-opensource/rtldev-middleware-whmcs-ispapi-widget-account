@@ -1,3 +1,10 @@
+## [3.1.5](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.4...v3.1.5) (2021-09-22)
+
+
+### Performance Improvements
+
+* **npm:** bump deps in direction of semantic-release v18 ([f14cb5b](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/f14cb5b9194cc1ab116be6437e0393d0ddc28890))
+
 ## [3.1.4](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.3...v3.1.4) (2021-09-22)
 
 
