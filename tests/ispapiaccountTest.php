@@ -26,7 +26,6 @@ final class AccoundWidgetTest extends TestCase
     {
         $data = $accountwidget->getData();
         $this->assertArrayHasKey('balance', $data);
-        $this->assertArrayHasKey('stats', $data);
         return $data;
     }
     /**
@@ -36,10 +35,8 @@ final class AccoundWidgetTest extends TestCase
     {
         // enabled widget, api data available
         $balanceObject = new IspapiBalance();
-        $statsObject = new IspapiStatistics();
         $result = $accountwidget->generateOutput([
             "balance" => $balanceObject,
-            "stats" => $statsObject,
             "status" => 1
         ]);
         $matcher = "<div class=\"data color-pink\">-26498.09</div>";
@@ -65,7 +62,6 @@ final class AccoundWidgetTest extends TestCase
         $_REQUEST["refresh"] = 1;
         $result = $accountwidget->generateOutput([
             "balance" => $balanceObject,
-            "stats" => $statsObject,
             "status" => 1
         ]);
         $matcher = "<div class=\"data color-pink\">-26498.09</div>";

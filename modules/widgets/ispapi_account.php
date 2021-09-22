@@ -140,9 +140,6 @@ class IspapiAccountWidget extends IspapiBaseWidget
     /** @var IspapiBalance */
     private $balanceObject = null;
 
-    /** @var IspapiStatistics */
-    private $statsObject = null;
-
     /** @var string */
     const VERSION = "3.1.5";//keep it that way (version updater, whmcs needs this accessible in public)
 
@@ -154,7 +151,6 @@ class IspapiAccountWidget extends IspapiBaseWidget
         parent::__construct("ispapiAccountWidget");
         // prefer composition over inheritance
         $this->balanceObject = new IspapiBalance();
-        $this->statsObject = new IspapiStatistics();
         $this->weight = self::SORT_WEIGHT; // override parent class value
         $this->cacheExpiry = self::TIME_IN_SECONDS; // override parent class value
         $this->title = "HEXONET ISPAPI Account Overview"; // override parent class value
@@ -168,8 +164,7 @@ class IspapiAccountWidget extends IspapiBaseWidget
     {
         if (class_exists(Ispapi::class)) {
             return array_merge(parent::getData(), [
-                "balance" => $this->balanceObject,
-                "stats" => $this->statsObject
+                "balance" => $this->balanceObject
             ]);
         }
         // @codeCoverageIgnoreStart
@@ -201,7 +196,7 @@ class IspapiAccountWidget extends IspapiBaseWidget
 
         // generate HTML
         $balanceHTML = $data["balance"]->toHTML();
-        $statsHTML = $data["stats"]->toHTML();
+        $logo = ISPAPI_LOGO_URL;
         $html .= <<<HTML
             <div class="widget-billing">
                 <div class="row account-overview-widget">
@@ -209,7 +204,9 @@ class IspapiAccountWidget extends IspapiBaseWidget
                         {$balanceHTML}
                     </div>
                     <div class="col-sm-6">
-                        {$statsHTML}
+                        <div class="text-center">
+                            <img src="${logo}" width="125" height="40">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -225,100 +222,6 @@ class IspapiAccountWidget extends IspapiBaseWidget
             <script type="text/javascript">
             hxStartCounter("#balexpires");
             </script>
-        HTML;
-    }
-}
-class IspapiStatistics
-{
-    /** @var array<string, mixed> */
-    private $data = [];
-    public function __construct()
-    {
-        // init object statistics
-        $this->init();
-    }
-    /**
-     * Magic setter
-     * @param array<string,mixed>|string $value
-     * @return void
-     */
-    public function __set(string $name, $value): void
-    {
-        $this->data[$name] = $value;
-    }
-    /**
-     * Magic getter
-     * @return mixed|null
-     */
-    public function __get(string $name)
-    {
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
-        }
-        return null;
-    }
-    /**
-     * Magic isset function
-     * @return bool
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->data[$name]);
-    }
-    /**
-     * Magic unset function
-     * @return void
-     */
-    public function __unset(string $name): void
-    {
-        unset($this->data[$name]);
-    }
-    /**
-     * get object statistics
-     * @return void
-     */
-    private function init(): void
-    {
-        $this->data = [];
-        // DEPRECATED as of RSRBE-2122
-        /*$userObjectStats = Ispapi::call([
-            "COMMAND" => "QueryUserObjectStatistics"
-        ]);
-        if ($userObjectStats["CODE"] === "200" || !empty($userObjectStats["PROPERTY"])) {
-            foreach ($userObjectStats["PROPERTY"] as $key => $val) {
-                if (!preg_match("/_/", $key)) {
-                    $productTitle = $this->getProductTitle($key);
-                    $this->data[$productTitle] = $val[0];
-                }
-            }
-            ksort($this->data);
-        }*/
-    }
-    /**
-     * generate statistics as HTML
-     * @return string
-     */
-    public function toHTML(): string
-    {
-        $statsHTML = "";
-        if (empty($this->data)) {
-            $logoURL = ISPAPI_LOGO_URL;
-            return <<<HTML
-                <div class="text-center">
-                    <img src="{$logoURL}" width="125" height="40"/>
-                </div>
-            HTML;
-        }
-
-        $statsHTML = "";
-        foreach ($this->data as $productTitle => $count) {
-            $statsHTML .= <<<HTML
-                <div class="col-xs-9 col-sm-8">{$productTitle}</div>
-                <div class="col-xs-3 col-sm-4 text-right">{$count}</div>
-            HTML;
-        }
-        return <<<HTML
-            <div class="row">{$statsHTML}</div>
         HTML;
     }
 }
@@ -635,6 +538,7 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
                 vals.forEach((val, idx) => {
                     html += " " + val + units[idx];
                 });
+                console.log(html);
                 return html.substr(1);
             }
             </script>
