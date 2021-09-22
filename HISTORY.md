@@ -1,3 +1,10 @@
+## [3.1.4](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.3...v3.1.4) (2021-09-22)
+
+
+### Performance Improvements
+
+* **OOP:** separation of concerns (status logics) ([b1594cf](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/b1594cf6a450e9015752c47cc89f33d386e9ec8f))
+
 ## [3.1.3](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.2...v3.1.3) (2021-09-20)
 
 
