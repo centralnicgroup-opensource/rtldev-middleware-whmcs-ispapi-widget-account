@@ -1,3 +1,10 @@
+## [3.1.6](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.5...v3.1.6) (2021-09-22)
+
+
+### Performance Improvements
+
+* **cleanup:** drop IspapiStatistics class as underlying API functionality is deprecated ([c4d1da3](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/c4d1da308d938cfb0f7f99aba0f0ed777ac7ba97))
+
 ## [3.1.5](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.4...v3.1.5) (2021-09-22)
 
 
