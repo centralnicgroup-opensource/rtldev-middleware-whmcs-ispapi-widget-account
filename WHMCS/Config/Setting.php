@@ -13,12 +13,17 @@ class Setting
 
     public static function getValue(string $setting): ?string
     {
-        if (isset(self::$config["status"])) {
-            return self::$config["status"];
+        if (isset(self::$config[$setting])) {
+            return self::$config[$setting];
         }
         return null;
     }
-    public static function setValue(string $key, mixed $value): void
+    /**
+     * set the value for a key
+     * @param string $key key name
+     * @param mixed $value value
+     */
+    public static function setValue(string $key, $value): void
     {
         $value = trim($value);
         self::$config[$key] = (string)$value;

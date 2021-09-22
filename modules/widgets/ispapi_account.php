@@ -15,14 +15,127 @@
 namespace WHMCS\Module\Widget;
 
 use WHMCS\Module\Registrar\Ispapi\Ispapi;
+use WHMCS\Config\Setting;
 
 const ISPAPI_LOGO_URL = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png";
 const ISPAPI_REGISTRAR_GIT_URL = "https://github.com/hexonet/whmcs-ispapi-registrar";
 
+class IspapiBaseWidget extends \WHMCS\Module\AbstractWidget
+{
+
+    protected string $widgetid;
+
+    public function __construct(string $id)
+    {
+        $this->widgetid = $id;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    /**
+     * Fetch data that will be provided to generateOutput method
+     * @return mixed data array or null in case of an error
+     */
+    public function getData()
+    {
+        $status = \App::getFromRequest("status");
+        if ($status !== "") {
+            $status = (int)$status;
+            if (in_array($status, [0,1])) {
+                Setting::setValue($this->widgetid, $status);
+            }
+            return [
+                "success" => (int)Setting::getValue($this->widgetid) === $status
+            ];
+        }
+
+        $status = Setting::getValue($this->widgetid);
+        if (is_null($status)) {
+            $status = 1;
+        }
+        return [
+            "status" => (int)$status
+        ];
+    }
+
+    /**
+     * generate widget"s html output
+     * @param mixed $data input data (from getData method)
+     * @return string html code
+     */
+    public function generateOutput($data)
+    {
+        // missing or inactive registrar Module
+        if ($data["status"] === -1) {
+            $gitURL = ISPAPI_REGISTRAR_GIT_URL;
+            $logoURL = ISPAPI_LOGO_URL;
+            return <<<HTML
+                <div class="widget-content-padded widget-billing">
+                    <div class="color-pink">
+                        Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
+                        <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
+                        <a href="{$gitURL}">
+                            <img src="{$logoURL}" width="125" height="40"/>
+                        </a>
+                    </div>
+                </div>
+            HTML;
+        }
+
+        // show our widget
+        $html = "";
+        if ($data["status"] === 0) {
+            $html = <<<HTML
+            <div class="widget-billing">
+                <div class="row account-overview-widget">
+                    <div class="col-sm-12">
+                        <div class="item">
+                            <div class="note">
+                                Widget is currently disabled. Use the first icon for enabling.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            HTML;
+        }
+        // Data Refresh Request -> avoid including JavaScript
+        if (empty($_REQUEST["refresh"])) {
+            $ico = ($data["status"] === 1) ? "on" : "off";
+            $wid = ucfirst($this->widgetid);
+            $html = <<<HTML
+            {$html}
+            <script type="text/javascript">
+            if (!$("#panel${wid} .widget-tools .hx-widget-toggle").length) {
+                $("#panel${wid} .widget-tools").prepend(
+                    `<a href="#" class="hx-widget-toggle" data-status="${data["status"]}">
+                        <i class=\"fas fa-toggle-${ico}\"></i>
+                    </a>`
+                );
+            }
+            $("#panel${wid} .hx-widget-toggle").off().on("click", function (event) {
+                event.preventDefault();
+                const newstatus = (1 - $(this).data("status"));
+                const url = WHMCS.adminUtils.getAdminRouteUrl("/widget/refresh&widget=${wid}&status=" + newstatus)
+                WHMCS.http.jqClient.post(url, function (json) {
+                    if (json.success && (JSON.parse(json.widgetOutput)).success) {
+                        window.location.reload(); // widget refresh doesn't update the height
+                    }
+                }, 'json');
+            });
+            </script>
+            HTML;
+        }
+
+        return $html;
+    }
+}
+
 /**
  * ISPAPI Account Widget.
  */
-class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
+class IspapiAccountWidget extends IspapiBaseWidget
 {
     /** @var IspapiBalance */
     private $balanceObject = null;
@@ -38,7 +151,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 
     public function __construct()
     {
-        session_start();
+        parent::__construct("ispapiAccountWidget");
         // prefer composition over inheritance
         $this->balanceObject = new IspapiBalance();
         $this->statsObject = new IspapiStatistics();
@@ -49,33 +162,20 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 
     /**
      * Fetch data that will be provided to generateOutput method
-     * @return mixed data array or null in case of an error
+     * @return array<string, mixed> data array
      */
     public function getData()
     {
-        $status = \App::getFromRequest("status");
-        if ($status !== "") {
-            $status = (int)$status;
-            if (in_array($status, [0,1])) {
-                \WHMCS\Config\Setting::setValue("ispapiAccountWidget", $status);
-            }
-            return [
-                "success" => (int)\WHMCS\Config\Setting::getValue("ispapiAccountWidget") === $status
-            ];
-        }
         if (class_exists(Ispapi::class)) {
-            $status = \WHMCS\Config\Setting::getValue("ispapiAccountWidget");
-            if (is_null($status)) {
-                $status = 1;
-            }
-            return [
-                "status" => (int)$status,
+            return array_merge(parent::getData(), [
                 "balance" => $this->balanceObject,
                 "stats" => $this->statsObject
-            ];
+            ]);
         }
         // @codeCoverageIgnoreStart
-        return false;
+        return [
+            "status" => -1
+        ];
         // @codeCoverageIgnoreEnd
     }
 
@@ -86,90 +186,45 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
      */
     public function generateOutput($data)
     {
-        // generate HTML
-        if (is_array($data)) {
-            // post request
-            if (isset($data["success"])) {
-                return json_encode($data) ?: "[\"success\":false]";
-            }
-            // show our widget
-            $status = $data["status"];
-            if ($data["status"] === 0) {
-                $html = <<<HTML
-                <div class="widget-billing">
-                    <div class="row account-overview-widget">
-                        <div class="col-sm-12">
-                            <div class="item">
-                                <div class="note">
-                                    Widget is currently disabled. Use the first icon for enabling.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                HTML;
-            } else {
-                $balanceHTML = $data["balance"]->toHTML();
-                $statsHTML = $data["stats"]->toHTML();
-                $html = <<<HTML
-                    <div class="widget-billing">
-                        <div class="row account-overview-widget">
-                            <div class="col-sm-6 bordered-right">
-                                {$balanceHTML}
-                            </div>
-                            <div class="col-sm-6">
-                                {$statsHTML}
-                            </div>
-                        </div>
-                    </div>
-                HTML;
-            }
-            // Data Refresh Request -> avoid including JavaScript
-            if (!empty($_REQUEST["refresh"])) {
-                return $html;
-            }
+        if (isset($data["success"])) {
+            return json_encode($data) ?: "[\"success\":false]";
+        }
 
-            $ico = ($status === 1) ? "on" : "off";
-            $html = <<<HTML
-                {$html}
-                <script type="text/javascript">
-                hxStartCounter("#balexpires");
-                if (!$("#panelIspapiAccountWidget .widget-tools .hx-widget-toggle").length) {
-                    $("#panelIspapiAccountWidget .widget-tools").prepend(
-                        `<a href="#" class="hx-widget-toggle" data-status="${status}">
-                            <i class=\"fas fa-toggle-${ico}\"></i>
-                        </a>`
-                    );
-                }
-                $("#panelIspapiAccountWidget .hx-widget-toggle").off().on("click", function (event) {
-                    const newstatus = (1 - $(this).data("status"));
-                    const url = WHMCS.adminUtils.getAdminRouteUrl("/widget/refresh&widget=IspapiAccountWidget&status=" + newstatus)
-                    WHMCS.http.jqClient.post(url, function (json) {
-                            if (json.success && (JSON.parse(json.widgetOutput)).success) {
-                                window.location.reload(); // widget refresh doesn't update the height
-                            }
-                        },
-                        'json'
-                    );
-                });
-                </script>
-            HTML;
+        // widget controls / status switch
+        $html = parent::generateOutput($data);
+
+        // Missing Registrar Module (-1)
+        // Inactive Widget (0)
+        if ($data["status"] !== 1) {
             return $html;
         }
 
-        // otherwise, error string returned
-        $gitURL = ISPAPI_REGISTRAR_GIT_URL;
-        $logoURL = ISPAPI_LOGO_URL;
-        return <<<HTML
-            <div class="widget-content-padded widget-billing">
-                <div class="color-pink">
-                    Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
-                    <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
-                    <a href="{$gitURL}">
-                        <img src="{$logoURL}" width="125" height="40"/>
-                    </a>
+        // generate HTML
+        $balanceHTML = $data["balance"]->toHTML();
+        $statsHTML = $data["stats"]->toHTML();
+        $html .= <<<HTML
+            <div class="widget-billing">
+                <div class="row account-overview-widget">
+                    <div class="col-sm-6 bordered-right">
+                        {$balanceHTML}
+                    </div>
+                    <div class="col-sm-6">
+                        {$statsHTML}
+                    </div>
                 </div>
             </div>
+        HTML;
+
+        // Data Refresh Request -> avoid including JavaScript
+        if (!empty($_REQUEST["refresh"])) {
+            return $html;
+        }
+
+        return <<<HTML
+            {$html}
+            <script type="text/javascript">
+            hxStartCounter("#balexpires");
+            </script>
         HTML;
     }
 }
@@ -417,22 +472,17 @@ class IspapiBalance
         }
 
         $balanceColor = $data["isOverdraft"] ? "pink" : "green";
-        if (isset($_SESSION["ispapibalance"]["expires"])) {
-            $expires = $_SESSION["ispapibalance"]["expires"] - time();
-            $ttl = $_SESSION["ispapibalance"]["ttl"];
-            $startHTML = <<<HTML
-                <div class="item text-right">
-                    <div class="note">Data Cache expires: <span id="balexpires" class="ttlcounter" data-ttl="{$ttl}" data-expires="{$expires}" ></span></div>
-                    <script type="text/javascript">
-                    $("#balexpires").html(hxSecondsToHms({$expires}, {$ttl}));
-                    </script>
-                </div>
-            HTML;
-        } else {
-            $startHTML = <<<HTML
-                <div class="item text-right"><div class="note">&nbsp;</div></div>
-            HTML;
-        }
+        $expires = $_SESSION["ispapibalance"]["expires"] - time();
+        $ttl = $_SESSION["ispapibalance"]["ttl"];
+        $startHTML = <<<HTML
+            <div class="item text-right">
+                <div class="note">Data Cache expires: <span id="balexpires" class="ttlcounter" data-ttl="{$ttl}" data-expires="{$expires}" ></span></div>
+                <script type="text/javascript">
+                $("#balexpires").html(hxSecondsToHms({$expires}, {$ttl}));
+                </script>
+            </div>
+        HTML;
+
         $baseHTML = <<<HTML
             {$startHTML}
             <div class="item text-right">
@@ -476,8 +526,8 @@ class IspapiCurrency
     {
         $currencies = localAPI("GetCurrencies", []);
         $currenciesAsAssocList = [];
-        if ($currencies["result"] === "success") { /** @phpstan-ignore-line */
-            foreach ($currencies["currencies"]["currency"] as $idx => $d) { /** @phpstan-ignore-line */
+        if ($currencies["result"] === "success") {
+            foreach ($currencies["currencies"]["currency"] as $idx => $d) {
                 $currenciesAsAssocList[$d["code"]] = $d;
             }
         }
@@ -531,7 +581,7 @@ class IspapiCurrency
     }
 }
 
-
+// @codeCoverageIgnoreStart
 add_hook("AdminHomeWidgets", 1, function () {
     return new IspapiAccountWidget();
 });
@@ -591,3 +641,4 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
         HTML;
     }
 });
+// @codeCoverageIgnoreEnd
