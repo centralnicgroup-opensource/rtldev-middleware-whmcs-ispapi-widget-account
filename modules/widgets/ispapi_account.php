@@ -20,115 +20,118 @@ use WHMCS\Config\Setting;
 const ISPAPI_LOGO_URL = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png";
 const ISPAPI_REGISTRAR_GIT_URL = "https://github.com/hexonet/whmcs-ispapi-registrar";
 
-class IspapiBaseWidget extends \WHMCS\Module\AbstractWidget
-{
-
-    protected string $widgetid;
-
-    public function __construct(string $id)
+if (!class_exists('WHMCS\Module\Widget\IspapiBaseWidget')) {
+    class IspapiBaseWidget extends \WHMCS\Module\AbstractWidget
     {
-        $this->widgetid = $id;
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+
+        protected string $widgetid;
+
+        public function __construct(string $id)
+        {
+            $this->widgetid = $id;
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
         }
-    }
 
-    /**
-     * Fetch data that will be provided to generateOutput method
-     * @return mixed data array or null in case of an error
-     */
-    public function getData()
-    {
-        $status = \App::getFromRequest("status");
-        if ($status !== "") {
-            $status = (int)$status;
-            if (in_array($status, [0,1])) {
-                Setting::setValue($this->widgetid, $status);
+        /**
+         * Fetch data that will be provided to generateOutput method
+         * @return mixed data array or null in case of an error
+         */
+        public function getData()
+        {
+            $status = \App::getFromRequest("status");
+            if ($status !== "") {
+                $status = (int)$status;
+                if (in_array($status, [0,1])) {
+                    Setting::setValue($this->widgetid, $status);
+                }
+                return [
+                    "success" => (int)Setting::getValue($this->widgetid) === $status
+                ];
+            }
+
+            $status = Setting::getValue($this->widgetid);
+            if (is_null($status)) {
+                $status = 1;
             }
             return [
-                "success" => (int)Setting::getValue($this->widgetid) === $status
+                "status" => (int)$status
             ];
         }
 
-        $status = Setting::getValue($this->widgetid);
-        if (is_null($status)) {
-            $status = 1;
-        }
-        return [
-            "status" => (int)$status
-        ];
-    }
-
-    /**
-     * generate widget"s html output
-     * @param mixed $data input data (from getData method)
-     * @return string html code
-     */
-    public function generateOutput($data)
-    {
-        // missing or inactive registrar Module
-        if ($data["status"] === -1) {
-            $gitURL = ISPAPI_REGISTRAR_GIT_URL;
-            $logoURL = ISPAPI_LOGO_URL;
-            return <<<HTML
-                <div class="widget-content-padded widget-billing">
-                    <div class="color-pink">
-                        Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
-                        <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
-                        <a href="{$gitURL}">
-                            <img src="{$logoURL}" width="125" height="40"/>
-                        </a>
+        /**
+         * generate widget"s html output
+         * @param mixed $data input data (from getData method)
+         * @return string html code
+         */
+        public function generateOutput($data)
+        {
+            // missing or inactive registrar Module
+            if ($data["status"] === -1) {
+                $gitURL = ISPAPI_REGISTRAR_GIT_URL;
+                $logoURL = ISPAPI_LOGO_URL;
+                return <<<HTML
+                    <div class="widget-content-padded widget-billing">
+                        <div class="color-pink">
+                            Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
+                            <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
+                            <a href="{$gitURL}">
+                                <img src="{$logoURL}" width="125" height="40"/>
+                            </a>
+                        </div>
                     </div>
-                </div>
-            HTML;
-        }
+                HTML;
+            }
 
-        // show our widget
-        $html = "";
-        if ($data["status"] === 0) {
-            $html = <<<HTML
-            <div class="widget-billing">
-                <div class="row account-overview-widget">
-                    <div class="col-sm-12">
-                        <div class="item">
-                            <div class="note">
-                                Widget is currently disabled. Use the first icon for enabling.
+            // show our widget
+            $html = "";
+            if ($data["status"] === 0) {
+                $html = <<<HTML
+                <div class="widget-billing">
+                    <div class="row account-overview-widget">
+                        <div class="col-sm-12">
+                            <div class="item">
+                                <div class="note">
+                                    Widget is currently disabled. Use the first icon for enabling.
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            HTML;
-        }
-        // Data Refresh Request -> avoid including JavaScript
-        if (empty($_REQUEST["refresh"])) {
-            $ico = ($data["status"] === 1) ? "on" : "off";
-            $wid = ucfirst($this->widgetid);
-            $html = <<<HTML
-            {$html}
-            <script type="text/javascript">
-            if (!$("#panel${wid} .widget-tools .hx-widget-toggle").length) {
-                $("#panel${wid} .widget-tools").prepend(
-                    `<a href="#" class="hx-widget-toggle" data-status="${data["status"]}">
-                        <i class=\"fas fa-toggle-${ico}\"></i>
-                    </a>`
-                );
+                HTML;
             }
-            $("#panel${wid} .hx-widget-toggle").off().on("click", function (event) {
-                event.preventDefault();
-                const newstatus = (1 - $(this).data("status"));
-                const url = WHMCS.adminUtils.getAdminRouteUrl("/widget/refresh&widget=${wid}&status=" + newstatus)
-                WHMCS.http.jqClient.post(url, function (json) {
-                    if (json.success && (JSON.parse(json.widgetOutput)).success) {
-                        window.location.reload(); // widget refresh doesn't update the height
-                    }
-                }, 'json');
-            });
-            </script>
-            HTML;
-        }
+            // Data Refresh Request -> avoid including JavaScript
+            if (empty($_REQUEST["refresh"])) {
+                $ico = ($data["status"] === 1) ? "on" : "off";
+                $wid = ucfirst($this->widgetid);
+                $html = <<<HTML
+                {$html}
+                <script type="text/javascript">
+                if (!$("#panel${wid} .widget-tools .hx-widget-toggle").length) {
+                    $("#panel${wid} .widget-tools").prepend(
+                        `<a href="#" class="hx-widget-toggle" data-status="${data["status"]}">
+                            <i class=\"fas fa-toggle-${ico}\"></i>
+                        </a>`
+                    );
+                }
+                $("#panel${wid} .hx-widget-toggle").off().on("click", function (event) {
+                    $(this).find("i[class^=\"fas fa-toggle-\"]").attr("class", "fas fa-spinner fa-spin");
+                    event.preventDefault();
+                    const newstatus = (1 - $(this).data("status"));
+                    const url = WHMCS.adminUtils.getAdminRouteUrl("/widget/refresh&widget=${wid}&status=" + newstatus)
+                    WHMCS.http.jqClient.post(url, function (json) {
+                        if (json.success && (JSON.parse(json.widgetOutput)).success) {
+                            window.location.reload(); // widget refresh doesn't update the height
+                        }
+                    }, 'json');
+                });
+                </script>
+                HTML;
+            }
 
-        return $html;
+            return $html;
+        }
     }
 }
 
@@ -538,7 +541,6 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
                 vals.forEach((val, idx) => {
                     html += " " + val + units[idx];
                 });
-                console.log(html);
                 return html.substr(1);
             }
             </script>
