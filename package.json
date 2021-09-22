@@ -45,7 +45,7 @@
     "application"
   ],
   "devDependencies": {
-    "@hexonet/semantic-release-github-whmcsbase-config": "^2.0.1",
+    "@hexonet/semantic-release-github-whmcsbase-config": "^3.1.0",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-zip": "^5.0.2",
