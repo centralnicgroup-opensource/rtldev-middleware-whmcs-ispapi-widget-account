@@ -58,6 +58,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           submodules: recursive
+      - name: Coverage Report
+        run: |
+          echo "$HOME/.composer/vendor/bin" >> $GITHUB_PATH
+          composer update
+          composer run-script coverage
       - name: Setup NodeJS LTS
         uses: actions/setup-node@v2
       - name: Install dependencies

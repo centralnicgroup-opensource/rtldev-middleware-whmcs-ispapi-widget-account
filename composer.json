@@ -4,7 +4,8 @@
     "phpunit/phpunit": "^9.5"
   },
   "scripts": {
-    "test": "XDEBUG_MODE=coverage phpunit --coverage-html reports",
+    "test": "phpunit",
+    "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html reports",
     "phpstan": "phpstan analyze"
   }
 }
