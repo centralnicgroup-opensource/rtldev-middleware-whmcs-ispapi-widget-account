@@ -23,7 +23,7 @@ use WHMCS\Config\Setting;
 class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
 {
     /** @var string */
-    const VERSION = "3.1.7";//keep it that way (version updater, whmcs needs this accessible in public)
+    const VERSION = "3.1.8";//keep it that way (version updater, whmcs needs this accessible in public)
 
     /** @var string */
     protected $title = 'HEXONET Account Overview';

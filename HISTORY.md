@@ -1,3 +1,10 @@
+## [3.1.8](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.7...v3.1.8) (2021-09-29)
+
+
+### Bug Fixes
+
+* **oop:** remove baseclass and review start session ([46d4f74](https://github.com/hexonet/whmcs-ispapi-widget-account/commit/46d4f746415a33db9e2288e226f56d5efeaba761))
+
 ## [3.1.7](https://github.com/hexonet/whmcs-ispapi-widget-account/compare/v3.1.6...v3.1.7) (2021-09-22)
 
 
