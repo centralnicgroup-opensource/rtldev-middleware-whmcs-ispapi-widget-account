@@ -80,7 +80,7 @@ function doZip() {
     .pipe(dest("./pkg"));
 }
 
-exports.lint = series(doLint);
+exports.lint = doLint;
 
 exports.copy = series(doDistClean, doCopyFiles);
 

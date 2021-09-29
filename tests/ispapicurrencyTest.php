@@ -25,23 +25,4 @@ final class IspapiCurrencyTest extends TestCase
         $id = $currency->getId("USD");
         $this->assertEquals(1, $id);
     }
-    /**
-     * @cover magic getter
-     * @depends testCurrencyInstance
-     */
-    public function testMagicMethods(IspapiCurrency $currency)
-    {
-        // __get - null case
-        $this->assertNull($currency->__get("key"));
-        // __set
-        $currency->__set("key", "value");
-        // __get - test previouse set value
-        $this->assertEquals($currency->__get("key"), "value");
-        // __isset
-        $this->assertTrue($currency->__isset("key"), true);
-        // __unset
-        $currency->__unset("key");
-        // __get - test unset
-        $this->assertNull($currency->__get("key"));
-    }
 }

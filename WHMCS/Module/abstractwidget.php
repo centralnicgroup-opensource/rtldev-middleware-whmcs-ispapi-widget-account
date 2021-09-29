@@ -24,9 +24,15 @@ abstract class AbstractWidget
     protected $requiredPermission = "";
     /** @var bool */
     protected $draggable = true;
-    /** @var null */
-    protected $adminUser = null;
+    /** @var \stdClass */
+    protected $adminUser;
 
     abstract public function getData(); /** @phpstan-ignore-line */
     abstract public function generateOutput(string $data); /** @phpstan-ignore-line */
+
+    public function __construct()
+    {
+        $this->adminUser = new \stdClass();
+        $this->adminUser->hiddenWidgets = [];
+    }
 }

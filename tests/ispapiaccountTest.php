@@ -34,39 +34,42 @@ final class AccoundWidgetTest extends TestCase
     public function testGenerateOutput(IspapiAccountWidget $accountwidget)
     {
         // enabled widget, api data available
+        $_SESSION[IspapiAccountWidget::$widgetid] = [
+            "expires" => 3600,
+            "ttl" => 3600
+        ];
         $balanceObject = new IspapiBalance();
         $result = $accountwidget->generateOutput([
             "balance" => $balanceObject,
-            "status" => 1
+            "status" => 1,
+            "widgetid" => "IspapiAccountWidget"
         ]);
         $matcher = "<div class=\"data color-pink\">-26498.09</div>";
         $this->assertStringContainsString($matcher, $result);
-        $matcher = "window.location.reload()";
+        $matcher = "hxStartCounter(\"#hxbalexpires\");";
         $this->assertStringContainsString($matcher, $result);
 
         // registrar module missing or inactive
-        $result = $accountwidget->generateOutput([ "status" => -1 ]);
+        $result = $accountwidget->generateOutput([
+            "status" => -1,
+            "widgetid" => "IspapiAccountWidget"
+        ]);
         $matcher = "Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.";
         $this->assertStringContainsString($matcher, $result);
-        $matcher = "window.location.reload()";
-        $this->assertStringNotContainsString($matcher, $result);
-
-        // widget status has changed via xhr req
-        $result = $accountwidget->generateOutput([ "success" => true ]);
-        $matcher = "{\"success\":true}";
-        $this->assertStringContainsString($matcher, $result);
-        $matcher = "window.location.reload()";
+        $matcher = "hxStartCounter(\"#hxbalexpires\");";
         $this->assertStringNotContainsString($matcher, $result);
 
         // refresh request - main js logics shall not be returned
         $_REQUEST["refresh"] = 1;
+        // enabled widget, api data available
         $result = $accountwidget->generateOutput([
             "balance" => $balanceObject,
-            "status" => 1
+            "status" => 1,
+            "widgetid" => "IspapiAccountWidget"
         ]);
         $matcher = "<div class=\"data color-pink\">-26498.09</div>";
         $this->assertStringContainsString($matcher, $result);
-        $matcher = "window.location.reload()";
+        $matcher = "hxStartCounter(\"#hxbalexpires\");";
         $this->assertStringNotContainsString($matcher, $result);
     }
 }

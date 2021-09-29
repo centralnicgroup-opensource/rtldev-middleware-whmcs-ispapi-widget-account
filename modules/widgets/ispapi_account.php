@@ -17,73 +17,110 @@ namespace WHMCS\Module\Widget;
 use WHMCS\Module\Registrar\Ispapi\Ispapi;
 use WHMCS\Config\Setting;
 
-const ISPAPI_LOGO_URL = "https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png";
-const ISPAPI_REGISTRAR_GIT_URL = "https://github.com/hexonet/whmcs-ispapi-registrar";
+/**
+ * ISPAPI Account Widget.
+ */
+class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
+{
+    /** @var string */
+    const VERSION = "3.1.7";//keep it that way (version updater, whmcs needs this accessible in public)
 
-if (!class_exists('WHMCS\Module\Widget\IspapiBaseWidget')) {
-    class IspapiBaseWidget extends \WHMCS\Module\AbstractWidget
+    /** @var string */
+    protected $title = 'HEXONET Account Overview';
+    /** @var int */
+    protected $cacheExpiry = 120;
+    /** @var int */
+    protected $weight = 150;
+
+    /** @var string */
+    public static $widgetid = "IspapiAccountWidget";
+    /** @var int */
+    public static $sessionttl = 3600; // 1h
+
+    /**
+     * Fetch data that will be provided to generateOutput method
+     * @return array<string, mixed> data array
+     */
+    public function getData()
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
-        protected string $widgetid;
+        $id = self::$widgetid;
 
-        public function __construct(string $id)
-        {
-            $this->widgetid = $id;
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+        // dependendy missing
+        // @codeCoverageIgnoreStart
+        if (!class_exists(Ispapi::class)) {
+            return [
+                "status" => -1,
+                "widgetid" => $id
+            ];
+        }
+        // @codeCoverageIgnoreEnd
+
+        // status toggle
+        $status = \App::getFromRequest("status");
+        if ($status !== "") {
+            $status = (int)$status;
+            if (in_array($status, [0,1])) {
+                Setting::setValue($id . "status", $status);
             }
         }
 
-        /**
-         * Fetch data that will be provided to generateOutput method
-         * @return mixed data array or null in case of an error
-         */
-        public function getData()
-        {
-            $status = \App::getFromRequest("status");
-            if ($status !== "") {
-                $status = (int)$status;
-                if (in_array($status, [0,1])) {
-                    Setting::setValue($this->widgetid, $status);
-                }
-                return [
-                    "success" => (int)Setting::getValue($this->widgetid) === $status
-                ];
-            }
-
-            $status = Setting::getValue($this->widgetid);
-            if (is_null($status)) {
-                $status = 1;
-            }
+        // hidden widgets -> don't load data
+        $isHidden = in_array($id, $this->adminUser->hiddenWidgets);
+        if ($isHidden) {
             return [
-                "status" => (int)$status
+                "status" => 0,
+                "widgetid" => $id
             ];
         }
 
-        /**
-         * generate widget"s html output
-         * @param mixed $data input data (from getData method)
-         * @return string html code
-         */
-        public function generateOutput($data)
-        {
-            // missing or inactive registrar Module
-            if ($data["status"] === -1) {
-                $gitURL = ISPAPI_REGISTRAR_GIT_URL;
-                $logoURL = ISPAPI_LOGO_URL;
-                return <<<HTML
-                    <div class="widget-content-padded widget-billing">
-                        <div class="color-pink">
-                            Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
-                            <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
-                            <a href="{$gitURL}">
-                                <img src="{$logoURL}" width="125" height="40"/>
-                            </a>
-                        </div>
-                    </div>
-                HTML;
-            }
+        // load data
+        $status = Setting::getValue($id . "status");
+        $data = [
+            "status" => is_null($status) ? 1 : (int)$status,
+            "widgetid" => $id
+        ];
+        if (
+            !empty($_REQUEST["refresh"]) // refresh request
+            || !isset($_SESSION[$id]) // Session not yet initialized
+            || (time() > $_SESSION[$id]["expires"]) // data cache expired
+        ) {
+            $_SESSION[$id] = [
+                "expires" => time() + self::$sessionttl,
+                "ttl" =>  + self::$sessionttl
+            ];
+        }
 
+        return array_merge($data, [
+            "balance" => new IspapiBalance()
+        ]);
+    }
+
+    /**
+     * generate widget"s html output
+     * @param mixed $data input data (from getData method)
+     * @return string html code
+     */
+    public function generateOutput($data)
+    {
+        // widget controls / status switch
+        // missing or inactive registrar Module
+        if ($data["status"] === -1) {
+            $html = <<<HTML
+                <div class="widget-content-padded widget-billing">
+                    <div class="color-pink">
+                        Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
+                        <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
+                        <a href="https://github.com/hexonet/whmcs-ispapi-registrar">
+                            <img src="https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png" width="125" height="40"/>
+                        </a>
+                    </div>
+                </div>
+            HTML;
+        } else {
             // show our widget
             $html = "";
             if ($data["status"] === 0) {
@@ -102,94 +139,66 @@ if (!class_exists('WHMCS\Module\Widget\IspapiBaseWidget')) {
                 HTML;
             }
             // Data Refresh Request -> avoid including JavaScript
-            if (empty($_REQUEST["refresh"])) {
-                $ico = ($data["status"] === 1) ? "on" : "off";
-                $wid = ucfirst($this->widgetid);
-                $html = <<<HTML
-                {$html}
+            $expires = $_SESSION[$data["widgetid"]]["expires"] - time();
+            $ttl = $_SESSION[$data["widgetid"]]["ttl"];
+            $ico = ($data["status"] === 1) ? "on" : "off";
+            $wid = $data["widgetid"];
+            $status = $data["status"];
+
+            $html .= <<<HTML
                 <script type="text/javascript">
+                // fn shared with other widgets
+                function hxRefreshWidget(widgetName, requestString, cb) {
+                    const panelBody = $('.panel[data-widget="' + widgetName + '"] .panel-body');
+                    const url = WHMCS.adminUtils.getAdminRouteUrl('/widget/refresh&widget=' + widgetName + '&' + requestString);
+                    panelBody.addClass('panel-loading');
+                    return WHMCS.http.jqClient.post(url, function(data) {
+                        panelBody.html(data.widgetOutput);
+                        panelBody.removeClass('panel-loading');
+                    }, 'json').always(cb);
+                }
                 if (!$("#panel${wid} .widget-tools .hx-widget-toggle").length) {
                     $("#panel${wid} .widget-tools").prepend(
-                        `<a href="#" class="hx-widget-toggle" data-status="${data["status"]}">
+                        `<a href="#" class="hx-widget-toggle" data-status="${status}">
                             <i class=\"fas fa-toggle-${ico}\"></i>
                         </a>`
                     );
+                } else {
+                    $("a.hx-widget-toggle").data("status", {$status});
+                }
+                if (!$("#hxbalexpires").length) {
+                    $("#panel${wid} .widget-tools").prepend(
+                        `<a href="#" class="hx-widget-expires" data-expires="${expires}" data-ttl="${ttl}">
+                            <span id="hxbalexpires" class="ttlcounter"></span>
+                        </a>`
+                    );
+                }
+                $("#hxbalexpires")
+                    .data("ttl", {$ttl})
+                    .data("expires", {$expires})
+                    .html(hxSecondsToHms({$expires}, {$ttl}));
+                if ($("#panel${wid} .hx-widget-toggle").data("status") === 1) {
+                    $("a.hx-widget-expires").show();
+                } else {
+                    $("a.hx-widget-expires").hide();
                 }
                 $("#panel${wid} .hx-widget-toggle").off().on("click", function (event) {
-                    $(this).find("i[class^=\"fas fa-toggle-\"]").attr("class", "fas fa-spinner fa-spin");
                     event.preventDefault();
+                    const icon = $(this).find("i[class^=\"fas fa-toggle-\"]");
+                    const mythis = this;
+                    const widget = $(this).closest('.panel').data('widget');
                     const newstatus = (1 - $(this).data("status"));
-                    const url = WHMCS.adminUtils.getAdminRouteUrl("/widget/refresh&widget=${wid}&status=" + newstatus)
-                    WHMCS.http.jqClient.post(url, function (json) {
-                        if (json.success && (JSON.parse(json.widgetOutput)).success) {
-                            window.location.reload(); // widget refresh doesn't update the height
-                        }
-                    }, 'json');
+                    icon.attr("class", "fas fa-spinner fa-spin");
+                    hxRefreshWidget(widget, "refresh=1&status=" + newstatus, function(){
+                        icon.attr("class", "fas fa-toggle-" + ((newstatus === 0) ? "off" : "on"));
+                        $(mythis).data("status", newstatus);
+                        packery.fit(mythis);
+                        packery.shiftLayout();
+                    })
                 });
                 </script>
-                HTML;
-            }
-
-            return $html;
+            HTML;
         }
-    }
-}
-
-/**
- * ISPAPI Account Widget.
- */
-class IspapiAccountWidget extends IspapiBaseWidget
-{
-    /** @var IspapiBalance */
-    private $balanceObject = null;
-
-    /** @var string */
-    const VERSION = "3.1.7";//keep it that way (version updater, whmcs needs this accessible in public)
-
-    private const TIME_IN_SECONDS = 120;
-    private const SORT_WEIGHT = 150; // The sort weighting that determines the output position on the page
-
-    public function __construct()
-    {
-        parent::__construct("ispapiAccountWidget");
-        // prefer composition over inheritance
-        $this->balanceObject = new IspapiBalance();
-        $this->weight = self::SORT_WEIGHT; // override parent class value
-        $this->cacheExpiry = self::TIME_IN_SECONDS; // override parent class value
-        $this->title = "HEXONET ISPAPI Account Overview"; // override parent class value
-    }
-
-    /**
-     * Fetch data that will be provided to generateOutput method
-     * @return array<string, mixed> data array
-     */
-    public function getData()
-    {
-        if (class_exists(Ispapi::class)) {
-            return array_merge(parent::getData(), [
-                "balance" => $this->balanceObject
-            ]);
-        }
-        // @codeCoverageIgnoreStart
-        return [
-            "status" => -1
-        ];
-        // @codeCoverageIgnoreEnd
-    }
-
-    /**
-     * generate widget"s html output
-     * @param mixed $data input data (from getData method)
-     * @return string html code
-     */
-    public function generateOutput($data)
-    {
-        if (isset($data["success"])) {
-            return json_encode($data) ?: "[\"success\":false]";
-        }
-
-        // widget controls / status switch
-        $html = parent::generateOutput($data);
 
         // Missing Registrar Module (-1)
         // Inactive Widget (0)
@@ -198,8 +207,7 @@ class IspapiAccountWidget extends IspapiBaseWidget
         }
 
         // generate HTML
-        $balanceHTML = $data["balance"]->toHTML();
-        $logo = ISPAPI_LOGO_URL;
+        $balanceHTML = ($data["balance"])->toHTML();
         $html .= <<<HTML
             <div class="widget-billing">
                 <div class="row account-overview-widget">
@@ -208,7 +216,7 @@ class IspapiAccountWidget extends IspapiBaseWidget
                     </div>
                     <div class="col-sm-6">
                         <div class="text-center">
-                            <img src="${logo}" width="125" height="40">
+                            <img src="https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png" width="125" height="40">
                         </div>
                     </div>
                 </div>
@@ -223,7 +231,7 @@ class IspapiAccountWidget extends IspapiBaseWidget
         return <<<HTML
             {$html}
             <script type="text/javascript">
-            hxStartCounter("#balexpires");
+            hxStartCounter("#hxbalexpires");
             </script>
         HTML;
     }
@@ -238,79 +246,23 @@ class IspapiBalance
     public function __construct()
     {
         // init status
-        $this->init();
+        if (isset($_SESSION[IspapiAccountWidget::$widgetid]["data"])) { // data cache exists
+            $this->data = $_SESSION[IspapiAccountWidget::$widgetid]["data"];
+        } else {
+            $this->data = [];
+            $accountsStatus = Ispapi::call([
+                "COMMAND" => "StatusAccount"
+            ]);
+            if ($accountsStatus["CODE"] === "200") {
+                foreach ($accountsStatus["PROPERTY"] as $property => $value) {
+                    $this->data[$property] = $value[0];
+                }
+                $_SESSION[IspapiAccountWidget::$widgetid]["data"] = $this->data;
+            }
+        }
+
         // a reference to the currency instance in main class: IspapiAccountWidget
         $this->currencyObject = new IspapiCurrency();
-    }
-    /**
-     * Magic setter
-     * @param array<string,mixed>|string $value
-     * @return void
-     */
-    public function __set(string $name, $value): void
-    {
-        $this->data[$name] = $value;
-    }
-    /**
-     * Magic getter
-     * @return mixed|null
-     */
-    public function __get(string $name)
-    {
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
-        }
-        return null;
-    }
-    /**
-     * Magic isset function
-     * @return bool
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->data[$name]);
-    }
-    /**
-     * Magic unset function
-     * @return void
-     */
-    public function __unset(string $name): void
-    {
-        unset($this->data[$name]);
-    }
-
-    /**
-     * get account status from HEXONET API
-     * @return void
-     */
-    private function init(): void
-    {
-        if (
-            empty($_REQUEST["refresh"]) // no refresh request
-            && isset($_SESSION["ispapibalance"]) // data cache exists
-            && (time() <= $_SESSION["ispapibalance"]["expires"]) // data cache not expired
-        ) {
-            $this->data = $_SESSION["ispapibalance"]["data"];
-            return;
-        }
-        $this->data = [];
-        $accountsStatus = Ispapi::call([
-            "COMMAND" => "StatusAccount"
-        ]);
-        //$accountsStatus = RESPONSE_BALANCE_NO_DEPOSITS_OVERDRAFT;
-        //$accountsStatus = RESPONSE_BALANCE_NO_DEPOSITS_NO_OVERDRAFT;
-        //$accountsStatus = RESPONSE_BALANCE_WITH_DEPOSITS_OVERDRAFT;
-        //$accountsStatus = RESPONSE_BALANCE_WITH_DEPOSITS_NO_OVERDRAFT;
-        if ($accountsStatus["CODE"] === "200") {
-            foreach ($accountsStatus["PROPERTY"] as $property => $value) {
-                $this->data[$property] = $value[0];
-            }
-            $_SESSION["ispapibalance"] = [
-                "data" => $this->data,
-                "expires" => time() + 3600,
-                "ttl" => 3600
-            ];
-        }
     }
 
     /**
@@ -327,7 +279,7 @@ class IspapiBalance
         $fundsav = $amount - $deposit;
         $currency = $this->data["CURRENCY"];
         $currencyid = $this->currencyObject->getId($currency);
-        $data = [
+        return [
             "amount" => $amount,
             "deposit" => $deposit,
             "fundsav" => $fundsav,
@@ -336,7 +288,6 @@ class IspapiBalance
             "hasDeposits" => $deposit > 0,
             "isOverdraft" => $fundsav < 0
         ];
-        return $data;
     }
 
     /**
@@ -378,19 +329,10 @@ class IspapiBalance
         }
 
         $balanceColor = $data["isOverdraft"] ? "pink" : "green";
-        $expires = $_SESSION["ispapibalance"]["expires"] - time();
-        $ttl = $_SESSION["ispapibalance"]["ttl"];
-        $startHTML = <<<HTML
-            <div class="item text-right">
-                <div class="note">Data Cache expires: <span id="balexpires" class="ttlcounter" data-ttl="{$ttl}" data-expires="{$expires}" ></span></div>
-                <script type="text/javascript">
-                $("#balexpires").html(hxSecondsToHms({$expires}, {$ttl}));
-                </script>
-            </div>
-        HTML;
+        $expires = $_SESSION[IspapiAccountWidget::$widgetid]["expires"] - time();
+        $ttl = $_SESSION[IspapiAccountWidget::$widgetid]["ttl"];
 
         $baseHTML = <<<HTML
-            {$startHTML}
             <div class="item text-right">
                 <div class="data color-{$balanceColor}">{$data["fundsav"]}</div>
                 <div class="note">Account Balance</div>
@@ -422,14 +364,6 @@ class IspapiCurrency
     public function __construct()
     {
         // init currency
-        $this->init();
-    }
-    /**
-     * load configured currencies
-     * @return void
-     */
-    private function init(): void
-    {
         $currencies = localAPI("GetCurrencies", []);
         $currenciesAsAssocList = [];
         if ($currencies["result"] === "success") {
@@ -439,42 +373,6 @@ class IspapiCurrency
         }
         $this->data["currencies"] = $currenciesAsAssocList;
     }
-    /**
-     * Magic setter
-     * @param array<string,mixed>|string $value
-     * @return void
-     */
-    public function __set(string $name, $value): void
-    {
-        $this->data[$name] = $value;
-    }
-    /**
-     * Magic getter
-     * @return null or primitive data type
-     */
-    public function __get(string $name)
-    {
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
-        }
-        return null;
-    }
-    /**
-     * Magic isset function
-     * @return bool
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->data[$name]);
-    }
-    /**
-     * Magic unset function
-     * @return void
-     */
-    public function __unset(string $name): void
-    {
-        unset($this->data[$name]);
-    }
 
     /**
      * get currency id of a currency identified by given currency code
@@ -483,7 +381,9 @@ class IspapiCurrency
      */
     public function getId(string $currency): ?int
     {
-        return isset($this->data["currencies"][$currency]) ? $this->data["currencies"][$currency]["id"] : null;
+        return (isset($this->data["currencies"][$currency])) ?
+            $this->data["currencies"][$currency]["id"] :
+            null;
     }
 }
 
@@ -504,17 +404,16 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
                 }
             </style>
             <script>
-            let hxbalcounter = null;
             function hxStartCounter(sel) {
-                if (!$(sel).length || hxbalcounter !== null) {
+                if (!$(sel).length) {
                     return;
                 }
-                hxbalcounter = setInterval(function(){
+                setInterval(function(){
                     $(sel).each(hxDecrementCounter);
                 }, 1000);
             }
             function hxDecrementCounter() {
-                const expires = $(this).data("expires") - 1;
+                let expires = $(this).data("expires") - 1;
                 const ttl = $(this).data("ttl");
                 $(this).data("expires", expires);
                 $(this).html(hxSecondsToHms(expires, ttl));
@@ -536,7 +435,6 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
                 });
                 vals = vals.splice(vals.length - steps);
                 units = units.splice(units.length - steps);
-
                 let html = "";
                 vals.forEach((val, idx) => {
                     html += " " + val + units[idx];
