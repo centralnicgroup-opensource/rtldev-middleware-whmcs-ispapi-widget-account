@@ -1,7 +1,0 @@
-parameters:
-    level: 8
-    paths:
-        - modules
-        - WHMCS
-    bootstrapFiles:
-        - vendor/autoload.php
