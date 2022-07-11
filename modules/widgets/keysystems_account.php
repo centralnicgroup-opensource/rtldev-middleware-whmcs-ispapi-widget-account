@@ -1,7 +1,7 @@
 <?php
 
 /**
- * WHMCS ISPAPI Account Dashboard Widget
+ * WHMCS Keysystems Account Dashboard Widget
  *
  * This Widget allows to display your account balance.
  *
@@ -14,26 +14,25 @@
 // phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
 namespace WHMCS\Module\Widget;
 
-use WHMCS\Module\Registrar\Ispapi\Ispapi;
 use WHMCS\Config\Setting;
 
 /**
- * ISPAPI Account Widget.
+ * Keysystems Account Widget.
  */
-class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
+class KeysystemsAccountWidget extends \WHMCS\Module\AbstractWidget
 {
     /** @var string */
-    const VERSION = "3.1.8";//keep it that way (version updater, whmcs needs this accessible in public)
+    const VERSION = "3.1.8"; //keep it that way (version updater, whmcs needs this accessible in public)
 
     /** @var string */
-    protected $title = 'HEXONET Account Overview';
+    protected $title = 'RRPproxy Account Overview';
     /** @var int */
     protected $cacheExpiry = 120;
     /** @var int */
     protected $weight = 150;
 
     /** @var string */
-    public static $widgetid = "IspapiAccountWidget";
+    public static $widgetid = "KeysystemsAccountWidget";
     /** @var int */
     public static $sessionttl = 3600; // 1h
 
@@ -48,10 +47,15 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
         }
 
         $id = self::$widgetid;
-
         // dependendy missing
+        $registrarid = 'keysystems'; // e.g. ispapi or keysystems
         // @codeCoverageIgnoreStart
-        if (!class_exists(Ispapi::class)) {
+        $registrar = new \WHMCS\Module\Registrar(); // phpcs:ignore 
+        if (
+            !$registrar->load($registrarid)
+            || !$registrar->isActivated()
+            || !function_exists($registrarid . '_getAccountDetails')
+        ) {
             return [
                 "status" => -1,
                 "widgetid" => $id
@@ -63,9 +67,11 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
         $status = \App::getFromRequest("status");
         if ($status !== "") {
             $status = (int)$status;
-            if (in_array($status, [0,1])) {
+            if (in_array($status, [0, 1])) {
                 Setting::setValue($id . "status", $status);
             }
+        } else {
+            $status = (int)Setting::getValue($id . "status");
         }
 
         // hidden widgets -> don't load data
@@ -78,7 +84,6 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
         }
 
         // load data
-        $status = Setting::getValue($id . "status");
         $data = [
             "status" => is_null($status) ? 1 : (int)$status,
             "widgetid" => $id
@@ -90,12 +95,11 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
         ) {
             $_SESSION[$id] = [
                 "expires" => time() + self::$sessionttl,
-                "ttl" =>  + self::$sessionttl
+                "ttl" =>  self::$sessionttl
             ];
         }
-
         return array_merge($data, [
-            "balance" => new IspapiBalance()
+            "balance" => new KeysystemsBalance()
         ]);
     }
 
@@ -112,10 +116,10 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
             $html = <<<HTML
                 <div class="widget-content-padded widget-billing">
                     <div class="color-pink">
-                        Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.
-                        <span data-toggle="tooltip" title="The HEXONET ISPAPI Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
-                        <a href="https://github.com/hexonet/whmcs-ispapi-registrar">
-                            <img src="https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png" width="125" height="40"/>
+                        Please install or upgrade to the latest RRPproxy (Keysystems) Registrar Module.
+                        <span data-toggle="tooltip" title="The RRPproxy (Keysystems) Registrar Module is regularly maintained, download and documentation available at github." class="glyphicon glyphicon-question-sign"></span><br/>
+                        <a href="https://github.com/rrpproxy/whmcs-rrpproxy-registrar">
+                            <img src="https://github.com/rrpproxy/whmcs-rrpproxy-registrar/raw/master/modules/registrars/keysystems/logo.png" width="125" height="40"/>
                         </a>
                     </div>
                 </div>
@@ -144,7 +148,6 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
             $ico = ($data["status"] === 1) ? "on" : "off";
             $wid = $data["widgetid"];
             $status = $data["status"];
-
             $html .= <<<HTML
                 <script type="text/javascript">
                 // fn shared with other widgets
@@ -157,44 +160,53 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
                         panelBody.removeClass('panel-loading');
                     }, 'json').always(cb);
                 }
-                if (!$("#panel${wid} .widget-tools .hx-widget-toggle").length) {
-                    $("#panel${wid} .widget-tools").prepend(
+                if (!$(`#panel${wid} .widget-tools .hx-widget-toggle`).length) {
+                    $(`#panel${wid} .widget-tools`).prepend(
                         `<a href="#" class="hx-widget-toggle" data-status="${status}">
                             <i class=\"fas fa-toggle-${ico}\"></i>
                         </a>`
                     );
-                } else {
-                    $("a.hx-widget-toggle").data("status", {$status});
+                }   
+                else {
+                    $(`#panel${wid} .widget-tools .hx-widget-toggle`).attr("data-status", ${status});
                 }
-                if (!$("#hxbalexpires").length) {
-                    $("#panel${wid} .widget-tools").prepend(
+                
+                if (!$(`#hxbalexpires${wid}`).length) {
+                    $(`#panel${wid} .widget-tools`).prepend(
                         `<a href="#" class="hx-widget-expires" data-expires="${expires}" data-ttl="${ttl}">
-                            <span id="hxbalexpires" class="ttlcounter"></span>
+                            <span id="hxbalexpires${wid}" class="ttlcounter"></span>
                         </a>`
                     );
                 }
-                $("#hxbalexpires")
+                $(`#hxbalexpires${wid}`)
                     .data("ttl", {$ttl})
                     .data("expires", {$expires})
                     .html(hxSecondsToHms({$expires}, {$ttl}));
-                if ($("#panel${wid} .hx-widget-toggle").data("status") === 1) {
-                    $("a.hx-widget-expires").show();
+                if ($(`#panel${wid} .hx-widget-toggle`).data("status") === 1) {
+                    $(`#panel${wid} .hx-widget-expires`).show();
                 } else {
-                    $("a.hx-widget-expires").hide();
+                    $(`#panel${wid} .hx-widget-expires`).hide();
                 }
-                $("#panel${wid} .hx-widget-toggle").off().on("click", function (event) {
+
+                $(`#panel${wid} .hx-widget-toggle`).off().on("click", function (event) {
                     event.preventDefault();
                     const icon = $(this).find("i[class^=\"fas fa-toggle-\"]");
                     const mythis = this;
                     const widget = $(this).closest('.panel').data('widget');
-                    const newstatus = (1 - $(this).data("status"));
-                    icon.attr("class", "fas fa-spinner fa-spin");
+                    const newstatus = (1 - $(this).attr("data-status"));
+                    icon.attr("class", "fas fa-spinner fa-spin"); 
                     hxRefreshWidget(widget, "refresh=1&status=" + newstatus, function(){
                         icon.attr("class", "fas fa-toggle-" + ((newstatus === 0) ? "off" : "on"));
-                        $(mythis).data("status", newstatus);
-                        packery.fit(mythis);
+                        $(this).attr("data-status", newstatus);
+                        if(newstatus === 1) {
+                            $(`#panel${wid} .hx-widget-expires`).show();
+                        }
+                        else {
+                            $(`#panel${wid} .hx-widget-expires`).hide();
+                        }
+                        packery.fit(this);
                         packery.shiftLayout();
-                    })
+                    }.bind(this))
                 });
                 </script>
             HTML;
@@ -216,7 +228,7 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
                     </div>
                     <div class="col-sm-6">
                         <div class="text-center">
-                            <img src="https://raw.githubusercontent.com/hexonet/whmcs-ispapi-registrar/master/modules/registrars/ispapi/logo.png" width="125" height="40">
+                            <img src="https://github.com/rrpproxy/whmcs-rrpproxy-registrar/raw/master/modules/registrars/keysystems/logo.png" width="125" height="40">
                         </div>
                     </div>
                 </div>
@@ -231,38 +243,41 @@ class IspapiAccountWidget extends \WHMCS\Module\AbstractWidget
         return <<<HTML
             {$html}
             <script type="text/javascript">
-            hxStartCounter("#hxbalexpires");
+              hxStartCounter(`#hxbalexpires${wid}`);
             </script>
         HTML;
     }
 }
-class IspapiBalance
+class KeysystemsBalance
 {
     /** @var array<string, mixed> */
     private $data = [];
-    /** @var IspapiCurrency */
+    /** @var KeysystemsCurrency */
     private $currencyObject = null;
 
     public function __construct()
     {
+        /**
+         * @codeCoverageIgnore
+         */
         // init status
-        if (isset($_SESSION[IspapiAccountWidget::$widgetid]["data"])) { // data cache exists
-            $this->data = $_SESSION[IspapiAccountWidget::$widgetid]["data"];
+        if (isset($_SESSION[KeysystemsAccountWidget::$widgetid]["data"])) { // data cache exists
+            $this->data = $_SESSION[KeysystemsAccountWidget::$widgetid]["data"];
         } else {
             $this->data = [];
-            $accountsStatus = Ispapi::call([
-                "COMMAND" => "StatusAccount"
-            ]);
-            if ($accountsStatus["CODE"] === "200") {
-                foreach ($accountsStatus["PROPERTY"] as $property => $value) {
-                    $this->data[$property] = $value[0];
+            $accountsStatus = keysystems_getAccountDetails(); // @codeCoverageIgnore
+            if ($accountsStatus["success"]) {
+                $this->data['amount'] = $accountsStatus['amount'];
+                $this->data['currency'] = $accountsStatus['currency'];
+                if (isset($accountsStatus['deposit'])) {
+                    $this->data['deposit'] = $accountsStatus['deposit'];
                 }
-                $_SESSION[IspapiAccountWidget::$widgetid]["data"] = $this->data;
+                $_SESSION[KeysystemsAccountWidget::$widgetid]["data"] = $this->data;
             }
         }
 
-        // a reference to the currency instance in main class: IspapiAccountWidget
-        $this->currencyObject = new IspapiCurrency();
+        // a reference to the currency instance in main class: KeysystemsAccountWidget
+        $this->currencyObject = new KeysystemsCurrency();
     }
 
     /**
@@ -274,10 +289,10 @@ class IspapiBalance
         if (empty($this->data)) {
             return null;
         }
-        $amount = floatval($this->data["AMOUNT"]);
-        $deposit = floatval($this->data["DEPOSIT"]);
+        $amount = floatval($this->data["amount"]);
+        $deposit = floatval($this->data["deposit"] ?? 0);
         $fundsav = $amount - $deposit;
-        $currency = $this->data["CURRENCY"];
+        $currency = $this->data["currency"];
         $currencyid = $this->currencyObject->getId($currency);
         return [
             "amount" => $amount,
@@ -329,12 +344,12 @@ class IspapiBalance
         }
 
         $balanceColor = $data["isOverdraft"] ? "pink" : "green";
-        $expires = $_SESSION[IspapiAccountWidget::$widgetid]["expires"] - time();
-        $ttl = $_SESSION[IspapiAccountWidget::$widgetid]["ttl"];
+        $expires = ($_SESSION[KeysystemsAccountWidget::$widgetid]["expires"] ?? 0) - time();
+        $ttl = $_SESSION[KeysystemsAccountWidget::$widgetid]["ttl"] ?? 0;
 
         $baseHTML = <<<HTML
             <div class="item text-right">
-                <div class="data color-{$balanceColor}">{$data["fundsav"]}</div>
+                <div class="data color-{$balanceColor}">{$data["amount"]}</div>
                 <div class="note">Account Balance</div>
             </div>
         HTML;
@@ -356,7 +371,7 @@ class IspapiBalance
     }
 }
 
-class IspapiCurrency
+class KeysystemsCurrency
 {
     /** @var array<string, mixed> */
     private $data = [];
@@ -389,11 +404,12 @@ class IspapiCurrency
 
 // @codeCoverageIgnoreStart
 add_hook("AdminHomeWidgets", 1, function () {
-    return new IspapiAccountWidget();
+    return new KeysystemsAccountWidget();
 });
 
 // css style
 add_hook("AdminAreaHeadOutput", 1, function ($vars) {
+    $widgetid = KeysystemsAccountWidget::$widgetid;
     if ($vars["pagetitle"] === "Dashboard") {
         return <<<HTML
             <style>
@@ -445,4 +461,3 @@ add_hook("AdminAreaHeadOutput", 1, function ($vars) {
         HTML;
     }
 });
-// @codeCoverageIgnoreEnd

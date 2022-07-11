@@ -1,5 +1,6 @@
 <?php
 
+global $apiCase;
 // To metigate missing functions for unit test
 /**
  * @codeCoverageIgnore
@@ -39,4 +40,55 @@ function localAPI(string $command, array $params)
 function formatCurrency(string $currency, int $currencyID)
 {
     return $currency;
+}
+
+function keysystems_getAccountDetails()
+{
+    global $apiCase;
+    if ($apiCase === 0) {
+        // test null, failure response, not 200
+        return [
+            "deposit" => null,
+            "amount" => null,
+            "currency" => null,
+            "success" => false
+        ];
+    } elseif ($apiCase === 1) {
+        // 1 = RESPONSE_BALANCE_NO_DEPOSITS_OVERDRAFT
+        return [
+            "deposit" => "10000.00",
+            "amount" => "-16498.09",
+            "currency" => "USD",
+            "success" => true
+        ];
+    } elseif ($apiCase === 2) {
+        // 2 = RESPONSE_BALANCE_NO_DEPOSITS_NO_OVERDRAFT
+        return [
+            "deposit" => "0.00",
+            "amount" => "16498.09",
+            "currency" => "CNY",
+            "success" => true
+        ];
+    } elseif ($apiCase === 3) {
+        // 3 = RESPONSE_BALANCE_WITH_DEPOSITS_OVERDRAFT
+        return [
+            "deposit" => "10000.00",
+            "amount" => "-16498.09",
+            "currency" => "CNY",
+            "success" => true
+        ];
+    } elseif ($apiCase === 4) {
+        // 4 = RESPONSE_BALANCE_WITH_DEPOSITS_NO_OVERDRAFT
+        return [
+            "deposit" => "10000.00",
+            "amount" => "16498.09",
+            "currency" => "USD",
+            "success" => "success"
+        ];
+    }
+    return [
+        "amount" => "-16498.09",
+        "currency" => "USD",
+        "success" => true
+    ];
 }

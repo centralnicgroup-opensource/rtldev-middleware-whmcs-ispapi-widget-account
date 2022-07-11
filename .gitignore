@@ -13,6 +13,10 @@ phpunit-reports
 # Generated Archives
 pkg
 build
+*.zip
 
 # phpunit
 .phpunit.result.cache
+
+# build files
+ispapi_account.php

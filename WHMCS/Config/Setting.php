@@ -7,7 +7,7 @@ class Setting
     /**
      * @var array<string, mixed> $config
      */
-    private static array $config = [
+    private static $config = [
         "status" => 0
     ];
 
