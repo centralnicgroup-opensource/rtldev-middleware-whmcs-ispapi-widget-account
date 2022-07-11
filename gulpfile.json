@@ -12,5 +12,5 @@
     "LICENSE",
     "modules/**"
   ],
-  "filesForCleanup": ["composer.lock", "package-lock.json", "tmp"]
+  "filesForCleanup": ["composer.lock", "tmp"]
 }
