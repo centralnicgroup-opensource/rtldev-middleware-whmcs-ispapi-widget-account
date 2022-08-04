@@ -8,11 +8,6 @@
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
     stderr="true">
-    <php>
-        <ini name="error_reporting" value="-1" />
-        <ini name="xdebug.mode" value="coverage" />
-        <env name="XDEBUG_MODE" value="coverage" />
-    </php>
     <testsuites>
         <testsuite name="common">
             <directory suffix="Test.php">tests</directory>
@@ -22,7 +17,7 @@
         <include>
             <directory suffix=".php">modules</directory>
             <directory suffix=".php">WHMCS</directory>
-        </include>  
+        </include>
         <exclude>
             <directory suffix=".php">./vendor/</directory>
         </exclude>

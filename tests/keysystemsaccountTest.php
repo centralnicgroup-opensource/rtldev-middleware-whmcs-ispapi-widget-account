@@ -3,26 +3,25 @@
 namespace WHMCS\Module\Widget;
 
 use PHPUnit\Framework\TestCase;
-use WHMCS\Module\Registrar\Ispapi\Ispapi;
+use WHMCS\Module\Registrar\Keysystems\Keysystems;
 
 final class AccoundWidgetTest extends TestCase
 {
-
     /**
-     * @cover IspapiAccpuntWidget __construct
+     * @cover KeysystemsAccpuntWidget __construct
      */
     public function testAccountWidgetInstance()
     {
-        $accountwidget = new IspapiAccountWidget();
+        $accountwidget = new KeysystemsAccountWidget();
 
-        $this->assertInstanceOf('whmcs\\module\\widget\\ispapiaccountwidget', $accountwidget);
+        $this->assertInstanceOf('whmcs\\module\\widget\\Keysystemsaccountwidget', $accountwidget);
 
         return $accountwidget;
     }
     /**
      * @depends testAccountWidgetInstance
      */
-    public function testGetData(IspapiAccountWidget $accountwidget)
+    public function testGetData(KeysystemsAccountWidget $accountwidget)
     {
         $data = $accountwidget->getData();
         $this->assertArrayHasKey('balance', $data);
@@ -31,32 +30,32 @@ final class AccoundWidgetTest extends TestCase
     /**
      * @depends testAccountWidgetInstance
      */
-    public function testGenerateOutput(IspapiAccountWidget $accountwidget)
+    public function testGenerateOutput(KeysystemsAccountWidget $accountwidget)
     {
         // enabled widget, api data available
-        $_SESSION[IspapiAccountWidget::$widgetid] = [
+        $_SESSION[KeysystemsAccountWidget::$widgetid] = [
             "expires" => 3600,
             "ttl" => 3600
         ];
-        $balanceObject = new IspapiBalance();
+        $balanceObject = new KeysystemsBalance();
         $result = $accountwidget->generateOutput([
             "balance" => $balanceObject,
             "status" => 1,
-            "widgetid" => "IspapiAccountWidget"
+            "widgetid" => "KeysystemsAccountWidget"
         ]);
-        $matcher = "<div class=\"data color-pink\">-26498.09</div>";
+        $matcher = "<div class=\"data color-pink\">-16498.09</div>";
         $this->assertStringContainsString($matcher, $result);
-        $matcher = "hxStartCounter(\"#hxbalexpires\");";
+        $matcher = "hxStartCounter(`#hxbalexpires" . KeysystemsAccountWidget::$widgetid . "`);";
         $this->assertStringContainsString($matcher, $result);
 
         // registrar module missing or inactive
         $result = $accountwidget->generateOutput([
             "status" => -1,
-            "widgetid" => "IspapiAccountWidget"
+            "widgetid" => "KeysystemsAccountWidget"
         ]);
-        $matcher = "Please install or upgrade to the latest HEXONET ISPAPI Registrar Module.";
+        $matcher = "Please install or upgrade to the latest RRPproxy (Keysystems) Registrar Module.";
         $this->assertStringContainsString($matcher, $result);
-        $matcher = "hxStartCounter(\"#hxbalexpires\");";
+        $matcher = "hxStartCounter(\"#hxbalexpires" . KeysystemsAccountWidget::$widgetid . "\");";
         $this->assertStringNotContainsString($matcher, $result);
 
         // refresh request - main js logics shall not be returned
@@ -65,11 +64,11 @@ final class AccoundWidgetTest extends TestCase
         $result = $accountwidget->generateOutput([
             "balance" => $balanceObject,
             "status" => 1,
-            "widgetid" => "IspapiAccountWidget"
+            "widgetid" => "KeysystemsAccountWidget"
         ]);
-        $matcher = "<div class=\"data color-pink\">-26498.09</div>";
+        $matcher = "<div class=\"data color-pink\">-16498.09</div>";
         $this->assertStringContainsString($matcher, $result);
-        $matcher = "hxStartCounter(\"#hxbalexpires\");";
+        $matcher = "hxStartCounter(\"#hxbalexpires" . KeysystemsAccountWidget::$widgetid . "\");";
         $this->assertStringNotContainsString($matcher, $result);
     }
 }
